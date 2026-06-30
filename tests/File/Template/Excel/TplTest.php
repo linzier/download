@@ -11,7 +11,7 @@ class TplTest extends TestCase
     {
         $cfgStr = '{
             "name": "money",
-            "title": "标题1",
+            "title": "Title 1",
             "type": "auto",
             "width": 50,
             "height": 40,
@@ -22,7 +22,7 @@ class TplTest extends TestCase
             "children": [
                 {
                     "name": "money",
-                    "title": "标题21",
+                    "title": "Title 21",
                     "type": "auto",
                     "width": 60,
                     "height": 50,
@@ -32,7 +32,7 @@ class TplTest extends TestCase
                     "bg_color": "white",
                     "children": [{
                         "name": "money",
-                        "title": "标题3",
+                        "title": "Title 3",
                         "type": "auto",
                         "width": 70,
                         "height": 60,
@@ -44,7 +44,7 @@ class TplTest extends TestCase
                 },
                 {
                     "name": "money",
-                    "title": "标题22",
+                    "title": "Title 22",
                     "type": "auto",
                     "width": 60,
                     "height": 50,
@@ -54,7 +54,7 @@ class TplTest extends TestCase
                     "bg_color": "white",
                     "children": [{
                         "name": "money",
-                        "title": "标题3",
+                        "title": "Title 3",
                         "type": "auto",
                         "width": 70,
                         "height": 60,

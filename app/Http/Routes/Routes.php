@@ -8,7 +8,7 @@ class Routes extends Route
 {
     public function map()
     {
-        // -------- 测试用 --------
+        // -------- For testing --------
         $this->get("/v1/test", "/V1/Test/index");
         $this->get("/v1/test/download", "/V1/Test/download");
         $this->get("/v1/test/create", "/V1/Test/createBigFile");
@@ -18,12 +18,12 @@ class Routes extends Route
         $this->get('/v1/test/sync', '/V1/Test/testSyncDownload');
         $this->get('/v1/test/retry', '/V1/Test/testCall');
         $this->get('/v1/test/timeout', '/V1/Test/timeout');
-        // -------- 测试用 End --------
+        // -------- End testing --------
 
         /**
-         * 下载数据
+         * Download data
          * @params:
-         *      ticket string 必填。临时 ticket，十分钟有效期
+         *      ticket string required. Temporary ticket, valid for 10 minutes
          */
         $this->get('/v1/download', '/V1/Download/getData');
     }

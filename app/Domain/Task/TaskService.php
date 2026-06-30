@@ -8,7 +8,7 @@ use App\Foundation\DTO\TaskDTO;
 use WecarSwoole\Exceptions\Exception;
 
 /**
- * 任务服务
+ * Task Service
  */
 class TaskService
 {
@@ -21,14 +21,14 @@ class TaskService
     }
 
     /**
-     * 创建新任务
-     * @return string 任务 id
+     * Create a new task
+     * @return string Task id
      */
     public function create(TaskDTO $taskDTO): Task
     {
         $task = TaskFactory::create($taskDTO);
 
-        // 存储到数据库
+        // Persist to database
         $this->taskRepository->addTask($task);
 
         return $task;
@@ -40,7 +40,7 @@ class TaskService
     }
 
     /**
-     * 切换任务状态
+     * Switch task status
      */
     public function switchStatus(Task $task, int $newStatus, string $failedReason = '')
     {
@@ -48,7 +48,7 @@ class TaskService
         $task->switchStatus($newStatus, $failedReason);
         
         if (!$this->taskRepository->changeTaskStatus($task, $oldStatus)) {
-            throw new Exception("修改任务状态失败：存储失败。{$task->id()}：{$oldStatus} -> {$newStatus}", ErrCode::INVALID_STATUS_OP);
+            throw new Exception("Failed to change task status: storage failure. {$task->id()}: {$oldStatus} -> {$newStatus}", ErrCode::INVALID_STATUS_OP);
         }
     }
 }

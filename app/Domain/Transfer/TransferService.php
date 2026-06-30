@@ -12,7 +12,7 @@ use EasySwoole\Utility\Random;
 use WecarSwoole\Exceptions\Exception;
 
 /**
- * 数据传输服务，用于处理目标文件的上传、下载
+ * Data Transfer Service: handles uploading and downloading of target files
  */
 class TransferService
 {
@@ -28,19 +28,19 @@ class TransferService
     }
 
     /**
-     * 将本地目标文件上传到远程存储
+     * Upload local target file to remote storage
      */
     public function upload(Task $task)
     {
         (new Upload())->upload($task->target()->targetFileName(), $task->id(), $task->target()->downloadFileName());
 
-        // 删除本地目标文件
+        // Delete local target files
         LocalFile::deleteDir($task->target()->getBaseDir());
     }
 
     /**
-     * 从远程或本地存储下载目标文件
-     * @return string 本地文件名称
+     * Download target file from remote or local storage
+     * @return string Local file name
      */
     public function download(Task $task, bool $isValidate = true): string
     {
@@ -55,22 +55,22 @@ class TransferService
     }
 
     /**
-     * 同步下载
-     * @return string 本地文件名称
+     * Synchronous download
+     * @return string Local file name
      */
     public function syncDownload(Task $task): string
     {
-        // 获取源数据
+        // Fetch source data
         $this->sourceService->fetch($task->source(), $task->target());
-        // 生成目标数据
+        // Generate target data
         $this->targetService->generate($task->source(), $task->target(), false);
-        // 下载
+        // Download
         return $this->download($task, false);
     }
 
     /**
-     * 生成临时下载 url
-     * @deprecated 不再使用该方法，使用 buildDownloadUrlNew
+     * Generate a temporary download URL
+     * @deprecated No longer used; use buildDownloadUrlNew instead
      */
     public function buildDownloadUrl(string $taskId, string $url): string
     {
@@ -81,7 +81,7 @@ class TransferService
     }
 
     /**
-     * 生成临时下载 url
+     * Generate a temporary download URL
      */
     public function buildDownloadUrlNew(Task $task): string
     {
@@ -89,7 +89,7 @@ class TransferService
     }
 
     /**
-     * 检查下载请求的合法性，防止恶意攻击
+     * Validate the download request to prevent malicious attacks
      */
     private function checkDownloadValidity(Task $task)
     {
@@ -110,7 +110,7 @@ class TransferService
     }
 
     /**
-     * 记录任务下载次数
+     * Record task download count
      */
     private function incrDownloadTimes(string $taskId)
     {

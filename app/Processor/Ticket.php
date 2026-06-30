@@ -8,7 +8,7 @@ use Swoole\Coroutine\Channel;
 use WecarSwoole\Container;
 
 /**
- * 限流票据
+ * Rate Limiting Ticket
  */
 final class Ticket
 {
@@ -16,7 +16,7 @@ final class Ticket
     private static $ticketsNum = [];
 
     /**
-     * 获取票据
+     * Acquire a ticket
      */
     public static function get(string $group)
     {
@@ -27,14 +27,14 @@ final class Ticket
         self::$channels[$group]->push(1, 3600);
         self::tick($group, 1);
 
-        // 票据安全性检测：如果票据快用完了，则要发告警通知（一般可能是某些异常任务长时间占用票据）
+        // Ticket safety check: if tickets are nearly exhausted, send an alert (typically caused by abnormal tasks holding tickets for too long)
         if (Ticket::remain($group) <= 1) {
-            Container::get(LoggerInterface::class)->warning("下载中心{$group}票据快用完，请检查是否存在异常任务处理");
+            Container::get(LoggerInterface::class)->warning("Download center {$group} tickets nearly exhausted, please check for abnormal task processing");
         }
     }
 
     /**
-     * 归还票据
+     * Return a ticket
      */
     public static function done(string $group)
     {
@@ -47,7 +47,7 @@ final class Ticket
     }
 
     /**
-     * 还剩多少票据
+     * How many tickets remain
      */
     private static function remain(string $group): int
     {

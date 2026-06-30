@@ -19,7 +19,7 @@ use App\ErrCode;
 use App\Foundation\DTO\DBTaskDTO;
 
 /**
- * 工厂：创建 task 对象
+ * Factory: create task objects
  */
 class TaskFactory
 {
@@ -32,10 +32,10 @@ class TaskFactory
     public static function create(TaskDTO $taskDTO): Task
     {
         if (!$project = Container::get(IProjectRepository::class)->getProjectById($taskDTO->projectId)) {
-            throw new Exception("创建任务失败：项目不存在", ErrCode::PROJ_NOT_EXISTS);
+            throw new Exception("Failed to create task: project does not exist", ErrCode::PROJ_NOT_EXISTS);
         }
 
-        // 此处并没有对外界传入的 id 做唯一性校验，有调用方保证
+        // No uniqueness check is performed on externally provided IDs; the caller is responsible for ensuring uniqueness
         $id = $taskDTO->id ?? Container::get(IIDGenerator::class)->id();
         $taskDTO->id = $id;
 
@@ -43,18 +43,18 @@ class TaskFactory
         $taskDTO->multiType = $taskDTO->multiType ?? ExcelTarget::MT_SINGLE;
 
         if ($taskDTO->multiType != ExcelTarget::MT_SINGLE) {
-            // 验证多表格数据格式
+            // Validate multi-table data format
             self::formatAndValidateMultiTableData($taskDTO);
         }
         
-        // 源
+        // Source
         $source = self::buildSource($taskDTO, $taskDTO->type ?? 'csv');
-        // 目标
+        // Target
         $target = self::buildTarget($taskDTO);
-        // 回调
+        // Callback
         $callback = new URI($taskDTO->callback ?: '');
 
-        // 基于 DTO 创建 Task 对象
+        // Create Task object based on DTO
         $task = new Task(
             $id,
             $taskDTO->name,
@@ -69,7 +69,7 @@ class TaskFactory
         );
 
         if ($taskDTO instanceof DBTaskDTO) {
-            // 来自存储层的数据，需要设置其他属性
+            // Data from the storage layer; set additional properties
             $task->createTime = $taskDTO->ctime;
             $task->lastExecTime = $taskDTO->etime;
             $task->finishedTime = $taskDTO->ftime;
@@ -83,7 +83,7 @@ class TaskFactory
     }
 
     /**
-     * template、title、summary、header、footer、source 数组的第一维元素个数必须相同而且顺序对应一致
+     * The number of first-dimension elements in the template, title, summary, header, footer, and source arrays must be the same and in corresponding order
      * @param TaskDTO $taskDTO
      * @throws \Exception
      */
@@ -92,11 +92,11 @@ class TaskFactory
         self::formatMT($taskDTO);
 
         if (!$taskDTO->source) {
-            throw new \Exception("缺少数据源", ErrCode::TPL_FMT_ERR);
+            throw new \Exception("Missing data source", ErrCode::TPL_FMT_ERR);
         }
 
         if (!self::innerValidateMT($taskDTO, ['template', 'title', 'summary', 'header', 'footer'], count($taskDTO->source))) {
-            throw new \Exception("多表格模式下 template、title、summary、header、footer、source 字段的元素个数必须一致（除非没有设置该字段）", ErrCode::PARAM_VALIDATE_FAIL);
+            throw new \Exception("In multi-table mode, the number of elements in template, title, summary, header, footer, and source fields must be consistent (unless the field is not set)", ErrCode::PARAM_VALIDATE_FAIL);
         }
     }
 
@@ -112,7 +112,7 @@ class TaskFactory
                 continue;
             }
 
-            // 如果为空或者没有设置，统一设置成空数组
+            // If empty or not set, default to an empty array
             $val = $taskDTO->{$field};
             if (!$val) {
                 $taskDTO->{$field} = [];
@@ -136,7 +136,7 @@ class TaskFactory
     private static function buildSource(TaskDTO $taskDTO, string $targetType): ISource
     {
         if (!$taskDTO->source) {
-            throw new \Exception("数据源错误", ErrCode::SOURCE_FORMAT_ERR);
+            throw new \Exception("Data source error", ErrCode::SOURCE_FORMAT_ERR);
         }
 
         $source = null;
@@ -160,7 +160,7 @@ class TaskFactory
     private static function buildTarget(TaskDTO $taskDTO): Target
     {
         if (!$taskDTO->template) {
-            throw new \Exception("模板异常", ErrCode::TPL_FMT_ERR);
+            throw new \Exception("Template error", ErrCode::TPL_FMT_ERR);
         }
 
         $baseDir = File::join(Config::getInstance()->getConf('local_file_base_dir'), $taskDTO->id);
@@ -185,7 +185,7 @@ class TaskFactory
                 );
                 return $excel;
             default:
-                throw new Exception("不支持的文件类型", ErrCode::FILE_TYPE_ERR);
+                throw new Exception("Unsupported file type", ErrCode::FILE_TYPE_ERR);
         }
     }
 }

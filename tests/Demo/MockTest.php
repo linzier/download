@@ -8,8 +8,8 @@ use Test\Demo\Sample\Observer;
 use Test\Demo\Sample\Subject;
 
 /**
- * 仿件(Mock)
- * 和桩件(Stub)不同的是，使用仿件时，测试目标是仿件本身（如检查仿件的某个方法是否被以某种方式调用了）
+ * Mocks
+ * Unlike Stubs, when using mocks, the test target is the mock itself (e.g., verifying whether a certain method on the mock was called in a specific way).
  * Class MockTest
  * @package Test\Demo
  */

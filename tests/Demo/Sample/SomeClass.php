@@ -3,7 +3,7 @@
 namespace Test\Demo\Sample;
 
 /**
- * 将要被上桩的类
+ * Class to be stubbed
  * Class SomeClass
  */
 class SomeClass

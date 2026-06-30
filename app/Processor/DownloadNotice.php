@@ -10,7 +10,7 @@ use Swoole\Coroutine;
 use WecarSwoole\Container;
 
 /**
- * 通过 web socket 监听任务下载情况，下载完成后通知客户端
+ * Monitors task download progress via WebSocket and notifies the client upon completion.
  * Class ScanNotice
  * @package App\Process
  */
@@ -22,22 +22,22 @@ class DownloadNotice
     public static function watch(int $fd, string $message)
     {
         list($msgType, $taskId) = self::decodeMsg($message);
-        // 仅支持 download 类型
+        // Only supports download type
         if ($msgType != self::MT_DOWNLOAD_LOOP || !$taskId) {
             return;
         }
 
         try {
             /**
-             * 循环检查，4s 一次
-             * 最多执行 2 小时
+             * Poll every 4 seconds
+             * Maximum duration: 2 hours
              */
             $server = ServerManager::getInstance()->getSwooleServer();
             $repos = Container::get(ITaskRepository::class);
             $usedTime = 0;
             while ($usedTime < 7200 && $server->isEstablished($fd)) {
                 if (!$status = $repos->getTaskStatus($taskId)) {
-                    return self::notify($fd, json_encode(['code' => ErrCode::TASK_NOT_EXISTS, 'msg' => '任务不存在', 'data' => []]));
+                    return self::notify($fd, json_encode(['code' => ErrCode::TASK_NOT_EXISTS, 'msg' => 'Task not found', 'data' => []]));
                 }
 
                 if ($status == Task::STATUS_SUC || $status == Task::STATUS_ERR) {
@@ -46,7 +46,7 @@ class DownloadNotice
                         json_encode(
                             [
                                 'code' => ErrCode::OK,
-                                'msg' => '任务处理' . ($status == Task::STATUS_SUC ? '成功' : '失败'),
+                                'msg' => 'Task ' . ($status == Task::STATUS_SUC ? 'succeeded' : 'failed'),
                                 'data' => ['status' => $status]
                             ]
                         )
@@ -57,14 +57,14 @@ class DownloadNotice
                 $usedTime += 4;
             }
 
-            self::notify($fd, json_encode(['code' => ErrCode::ERROR, 'msg' => '任务处理异常，请重试', 'data' => []]));
+            self::notify($fd, json_encode(['code' => ErrCode::ERROR, 'msg' => 'Task processing error, please retry', 'data' => []]));
         } catch (\Exception $e) {
             self::notify($fd, json_encode(['status' => $e->getCode(), 'msg' => $e->getMessage(), 'data' => []]));
         }
     }
 
     /**
-     * 通知客户端
+     * Notify the client
      */
     protected static function notify(int $fd, string $message)
     {

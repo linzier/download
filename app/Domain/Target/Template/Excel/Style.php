@@ -8,7 +8,7 @@ use WecarSwoole\OTA\IExtractable;
 use WecarSwoole\OTA\ObjectToArray;
 
 /**
- * 单元格样式
+ * Cell style
  */
 class Style implements IExtractable
 {
@@ -19,9 +19,9 @@ class Style implements IExtractable
     public const ALIGN_RIGHT = 'right';
     private const COLOR_LITERAL = ['black', 'white', 'red', 'green', 'blue', 'yellow', 'cyan'];
 
-    // 单元格宽度，默认 0
+    // Cell width, default 0
     private $width;
-    // 单元格高度，默认 0
+    // Cell height, default 0
     private $height;
     private $color;
     private $bgColor;
@@ -29,7 +29,7 @@ class Style implements IExtractable
     private $bold;
 
     /**
-     * styleCfg 可配置：width、height、color、bg_color、align、bold
+     * styleCfg configurable options: width, height, color, bg_color, align, bold
      */
     public function __construct(array $styleCfg = [])
     {
@@ -39,7 +39,7 @@ class Style implements IExtractable
     public function setWidth(int $width)
     {
         if ($width > 4000) {
-            throw new Exception("单元格宽度不合法:{$width}", ErrCode::PARAM_VALIDATE_FAIL);
+            throw new Exception("Invalid cell width: {$width}", ErrCode::PARAM_VALIDATE_FAIL);
         }
 
         $this->width = $width;
@@ -53,7 +53,7 @@ class Style implements IExtractable
     public function setHeight(int $height)
     {
         if ($height < 0 || $height > 4000) {
-            throw new Exception("单元格高度不合法:{$height}", ErrCode::PARAM_VALIDATE_FAIL);
+            throw new Exception("Invalid cell height: {$height}", ErrCode::PARAM_VALIDATE_FAIL);
         }
 
         $this->height = $height;
@@ -87,7 +87,7 @@ class Style implements IExtractable
     public function setAlign(string $align)
     {
         if (!in_array($align, [self::ALIGN_LEFT, self::ALIGN_RIGHT, self::ALIGN_CENTER])) {
-            throw new Exception("非法的对齐方式：{$align}", ErrCode::PARAM_VALIDATE_FAIL);
+            throw new Exception("Invalid alignment: {$align}", ErrCode::PARAM_VALIDATE_FAIL);
         }
 
         $this->align = $align;
@@ -131,7 +131,7 @@ class Style implements IExtractable
         $color = ltrim($color, '#');
         
         if (strlen($color) > 6) {
-            throw new Exception("非法的颜色格式：{$color}", ErrCode::PARAM_VALIDATE_FAIL);
+            throw new Exception("Invalid color format: {$color}", ErrCode::PARAM_VALIDATE_FAIL);
         }
 
         return $color;

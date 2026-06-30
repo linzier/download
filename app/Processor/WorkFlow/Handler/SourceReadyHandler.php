@@ -8,7 +8,7 @@ use WecarSwoole\Container;
 use Psr\Log\LoggerInterface;
 
 /**
- * 源数据就绪处理程序
+ * Source data ready handler
  */
 class SourceReadyHandler extends WorkHandler
 {
@@ -18,7 +18,7 @@ class SourceReadyHandler extends WorkHandler
     }
 
     /**
-     * 生成目标数据
+     * Generate target data
      */
     protected function exec()
     {

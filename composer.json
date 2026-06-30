@@ -1,6 +1,6 @@
 {
     "name": "dev/download-center",
-    "description": "喂车下载中心",
+    "description": "Weicheche Download Center",
     "type": "project",
     "require": {
         "framework/wecarswoole": "^1.0",

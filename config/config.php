@@ -4,8 +4,8 @@ use function WecarSwoole\Config\apollo;
 use WecarSwoole\Util\File;
 
 $baseConfig = [
-    'app_name' => '下载中心',
-    // 应用标识
+    'app_name' => 'Download Center',
+    // Application identifier
     'app_flag' => 'XZ',
     'app_id' => 10049,
     'request_id_key' => 'wcc-request-id',
@@ -13,7 +13,7 @@ $baseConfig = [
         'modules' => apollo('fw.modules'),
         'app_ids' => apollo('fw.appids'),
     ],
-    // 邮件。可以配多个
+    // Mailer. Multiple mailers can be configured
     'mailer' => [
         'default' => [
             'host' => apollo('fw.mail', 'mail.host'),
@@ -23,24 +23,24 @@ $baseConfig = [
             'encryption' => apollo('fw.mail', 'mail.encryption') ?: 'ssl',
         ]
     ],
-    // 并发锁配置
+    // Concurrent lock configuration
     'concurrent_locker' => [
         'onoff' => apollo('application', 'concurrent_locker.onoff') ?: 'off',
         'redis' => apollo('application', 'concurrent_locker.redis') ?: 'main',
     ],
-    // 请求日志配置。默认是关闭的，如果项目需要开启，则自行修改为 on
+    // Request log configuration. Disabled by default; set to 'on' to enable
     'request_log' => [
         'onoff' => apollo('application', 'request_log.onoff') ?: 'off',
-        // 记录哪些请求类型的日志
+        // Which request methods to log
         'methods' => explode(',', apollo('application', 'request_log.methods'))
     ],
     /**
-     * 数据库配置建议以数据库名作为 key
-     * 如果没有读写分离，则可不分 read, write，直接在里面写配置信息
+     * It is recommended to use the database name as the key
+     * If read-write separation is not needed, there is no need to split into read/write -- just write the config directly
      */
     'mysql' => [
         'download' => [
-            // 读库使用二维数组配置，以支持多个读库
+            // Read replicas configured as a 2D array to support multiple read replicas
             'read' => [
                 [
                     'host' => apollo('FW.mysql.download_center.rw', 'download_center.host'),
@@ -51,7 +51,7 @@ $baseConfig = [
                     'charset' => apollo('FW.mysql.download_center.rw', 'download_center.charset'),
                 ]
             ],
-            // 仅支持一个写库
+            // Only one write replica supported
             'write' => [
                 'host' => apollo('FW.mysql.download_center.rw', 'download_center.host'),
                 'port' => apollo('FW.mysql.download_center.rw', 'download_center.port'),
@@ -60,7 +60,7 @@ $baseConfig = [
                 'database' => apollo('FW.mysql.download_center.rw', 'download_center.dbname'),
                 'charset' => apollo('FW.mysql.download_center.rw', 'download_center.charset'),
             ],
-            // 连接池配置
+            // Connection pool configuration
             'pool' => [
                 'size' => apollo('application', 'mysql.weicheche.pool_size') ?: 15
             ]
@@ -72,7 +72,7 @@ $baseConfig = [
             'port' => apollo('application', 'redis_main_port'),
             'auth' => apollo('application', 'redis_main_auth'),
             'database' => apollo('application', 'redis_main_database') ?? 0,
-            // 连接池配置
+            // Connection pool configuration
             '__pool' => [
                 'max_object_num' => apollo('application', 'redis.pool.main.max_num') ?? 15,
                 'min_object_num' => apollo('application', 'redis.pool.main.min_num') ?? 1,
@@ -84,7 +84,7 @@ $baseConfig = [
             'port' => apollo('application', 'redis_main_port'),
             'auth' => apollo('application', 'redis_main_auth'),
             'database' => apollo('application', 'redis_main_database') ?? 0,
-            // 连接池配置
+            // Connection pool configuration
             '__pool' => [
                 'max_object_num' => apollo('application', 'redis.pool.cache.max_num') ?? 15,
                 'min_object_num' => apollo('application', 'redis.pool.cache.min_num') ?? 1,
@@ -96,7 +96,7 @@ $baseConfig = [
             'port' => apollo('application', 'redis_main_port'),
             'auth' => apollo('application', 'redis_main_auth'),
             'database' => apollo('application', 'redis_main_database') ?? 0,
-            // 连接池配置
+            // Connection pool configuration
             '__pool' => [
                 'max_object_num' => apollo('application', 'redis.pool.cache.max_num') ?? 15,
                 'min_object_num' => apollo('application', 'redis.pool.cache.min_num') ?? 1,
@@ -104,57 +104,57 @@ $baseConfig = [
             ]
         ],
     ],
-    // 缓存配置
+    // Cache configuration
     'cache' => [
-        // 可用：redis、file、array、null(一般测试时用来禁用缓存)
+        // Available drivers: redis, file, array, null (null is typically used to disable caching during testing)
         'driver' => apollo('application', 'cache.driver') ?: 'file',
         'prefix' => 'download',
-        'expire' => 3600, // 缓存默认过期时间，单位秒
-        'redis' => 'cache', // 当 driver = redis 时，使用哪个 redis 配置
-        'dir' => File::join(EASYSWOOLE_ROOT, 'storage/cache'), // 当 driver = file 时，缓存存放目录
+        'expire' => 3600, // Default cache expiration time in seconds
+        'redis' => 'cache', // Which Redis config to use when driver = redis
+        'dir' => File::join(EASYSWOOLE_ROOT, 'storage/cache'), // Cache directory when driver = file
     ],
-    // 最低记录级别：debug, info, warning, error, critical, off
+    // Minimum log level: debug, info, warning, error, critical, off
     'log_level' => apollo('application', 'log_level') ?: 'info',
     'base_url' => apollo('application', 'base_url'),
-    // 是否记录 api 调用日志
+    // Whether to log API invocations
     'api_invoke_log' => apollo('application', 'api_invoke_log') ?: 'on',
-    // 任务队列名称
+    // Task queue name
     'task_queue' => 'download-task',
-    // 每个进程并发执行的任务数最大值
+    // Maximum number of concurrently executing tasks per process
     'task_concurrent_limit' => apollo('application', 'task_concurrent_limit') ?: 20,
-    // 本地临时文件存储基路径
+    // Base path for local temporary file storage
     'local_file_base_dir' => File::join(EASYSWOOLE_ROOT, 'storage/data'),
-    // 单个 excel 文件最大尺寸（以源文件记），单位字节
+    // Maximum size of a single Excel file (source file size), in bytes
     'excel_max_size' => apollo('application', 'excel_max_size') ?: 50 * 1024 * 1024,
-    // 单个 excel 最大行数
+    // Maximum number of rows per Excel file
     'excel_max_count' => apollo('application', 'excel_max_count') ?: 10000,
-    // 文件压缩阈值，单位字节
+    // File compression threshold, in bytes
     'zip_threshold' => apollo('application', 'zip_threshold') ?: 200 * 1024,
-    // 文件压缩类型，目前仅支持 zip 压缩
+    // File compression type, currently only zip is supported
     'zip_type' => apollo('application', 'zip_type') ?: 'zip',
-    // 阿里云 OSS 服务 key
+    // Alibaba Cloud OSS service access key
     'oss_access_key' => apollo('application', 'oss_access_key'),
-    // 阿里云 OSS 服务 secret
+    // Alibaba Cloud OSS service secret
     'oss_access_secret' => apollo('application', 'oss_access_secret'),
-    // 阿里云 OSS 服务 endpoint (区域数据中心域名)
+    // Alibaba Cloud OSS service endpoint (regional data center domain)
     'oss_endpoint' => apollo('application', 'oss_endpoint'),
-    // 阿里云 OSS 服务 bucket（在阿里云 OSS 管理后台创建的）
+    // Alibaba Cloud OSS bucket (created in the Alibaba Cloud OSS console)
     'oss_bucket' => apollo('application', 'oss_bucket'),
-    // 临时下载 url（前端下载，无需 token 验证）
+    // Temporary download URL (frontend download, no token verification required)
     'tmp_download_url' => apollo('application', 'tmp_download_url') ?: '/v1/download',
-    // 后端下载 url（需要 token 验证）
+    // Backend download URL (token verification required)
     'backend_download_url' => apollo('application', 'backend_download_url') ?: '/v1/download/async',
-    // 同一个任务 10 分钟内允许下载的次数
+    // Maximum number of downloads allowed per task within 10 minutes
     'download_10m_limit' => apollo('application', 'download_10m_limit') ?: 5,
-    // 任务下载有效期（超过时间将不能下载），单位秒
+    // Task download expiration period (downloads not allowed after this period), in seconds
     'download_expire' => apollo('application', 'download_expire') ?: 86400 * 7,
-    // 进程处理完多少任务后将重启
+    // Number of tasks a process handles before it restarts
     'task_max_process' => apollo('application', 'task_max_process') ?: 1000,
-    // 任务处理时限（超过该时限还在“处理中”的任务将重新入列），任务投递时也可以指定该参数。该值在自定义进程中使用的，修改后需要人工重启服务（无法reload）
+    // Task processing time limit (tasks still "in progress" beyond this limit will be re-queued). This parameter can also be specified at task submission time. This value is used in the custom process; changes require a manual service restart (cannot be reloaded)
     'max_exec_time' => apollo('application', 'max_exec_time') ?: 3600,
-    // 主服务器 ip，主服务器上会执行守卫程序
+    // Master server IP. The defender process runs on the master server
     'master_server' => apollo('application', 'master_server'),
-    // 是否对相关接口进行 token 校验（继承 ApiRoute 的接口）。默认需要验证，此参数主要用来临时取消验证进行测试
+    // Whether to perform token verification on related APIs (APIs extending ApiRoute). Verification is enabled by default; this parameter is mainly used to temporarily disable verification for testing
     'auth_request' => apollo('application', 'auth_request') ?? 1,
 ];
 

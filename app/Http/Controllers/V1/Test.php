@@ -21,18 +21,18 @@ class Test extends Controller
 
         $spreadsheet = new Spreadsheet();
 
-        // 使用列缓存
+        // Use column cache
         $cache = new MyCustomPsr16Implementation();
         \PhpOffice\PhpSpreadsheet\Settings::setCache($cache);
 
-        // 设置语言
+        // Set language
         $locale = 'pt_br';
         $validLocale = \PhpOffice\PhpSpreadsheet\Settings::setLocale($locale);
         if (!$validLocale) {
             echo 'Unable to set locale to ' . $locale . " - reverting to en_us" . PHP_EOL;
         }
 
-        // 获取指定的 worksheet
+        // Get specified worksheet
         $spreadsheet->getSheet(1);
         $spreadsheet->getSheetByName('Worksheet 1');
         $spreadsheet->getActiveSheet();
@@ -41,11 +41,11 @@ class Test extends Controller
         $spreadsheet->setActiveSheetIndex(1);
         $spreadsheet->setActiveSheetIndexByName('name');
 
-        // 根据下标获取单元格，下标从 1 开始
+        // Get cell by index, index starts from 1
         $spreadsheet->getActiveSheet()->getCellByColumnAndRow(2, 5)->getValue();
         $letter = Coordinate::stringFromColumnIndex(2);
 
-        // 通过数组设置单元格值
+        // Set cell values via array
         $arrayData = [
             [NULL, 2010, 2011, 2012],
             ['Q1',   12,   15,   21],
@@ -61,7 +61,7 @@ class Test extends Controller
                         //    we want to set these values (default is A1)
         );
 
-        // 创建 worksheet
+        // Create worksheet
         $spreadsheet->createSheet();
         // Create a new worksheet called "My Data"
         $myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'My Data');
@@ -72,13 +72,13 @@ class Test extends Controller
         $clonedWorksheet->setTitle('Copy of Worksheet 1');
         $spreadsheet->addSheet($clonedWorksheet);
 
-        // 删除 worksheet
+        // Delete worksheet
         $sheetIndex = $spreadsheet->getIndex(
             $spreadsheet->getSheetByName('Worksheet 1')
         );
         $spreadsheet->removeSheetByIndex($sheetIndex);
 
-        // 设置元数据
+        // Set metadata
         $spreadsheet->getProperties()
         ->setCreator("Maarten Balliauw")
         ->setLastModifiedBy("Maarten Balliauw")
@@ -90,56 +90,56 @@ class Test extends Controller
         ->setKeywords("office 2007 openxml php")
         ->setCategory("Test result file");
 
-        // 设置文本换行
+        // Set text wrapping
         $spreadsheet->getActiveSheet()->getCell('A1')->setValue("hello\nworld");
         $spreadsheet->getActiveSheet()->getStyle('A1')->getAlignment()->setWrapText(true);
 
-        // 精确设置单元格格式
+        // Set cell format explicitly
         $spreadsheet->getActiveSheet()->getCell('A1')
         ->setValueExplicit(
             '25',
             \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC
         );
 
-        // 设置超链接
+        // Set hyperlink
         $spreadsheet->getActiveSheet()->setCellValue('E26', 'www.phpexcel.net');
         $spreadsheet->getActiveSheet()->getCell('E26')->getHyperlink()->setUrl('https://www.example.com');
 
-        // 链接到另一个 worksheet
+        // Link to another worksheet
         $spreadsheet->getActiveSheet()->setCellValue('E26', 'www.phpexcel.net');
         $spreadsheet->getActiveSheet()->getCell('E26')->getHyperlink()->setUrl("sheet://'Sheetname'!A1");
 
-        // 设置打印格式（方向、纸张大小）
+        // Set print format (orientation, paper size)
             $spreadsheet->getActiveSheet()->getPageSetup()
             ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
         $spreadsheet->getActiveSheet()->getPageSetup()
             ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4);
 
-        // 设置打印格式：宽高适配
+        // Set print format: fit to width/height
         $spreadsheet->getActiveSheet()->getPageSetup()->setFitToWidth(1);
         $spreadsheet->getActiveSheet()->getPageSetup()->setFitToHeight(0);
         $spreadsheet->getActiveSheet()->getPageSetup()->setScale(100);
 
-        // 设置打印格式：页边距
+        // Set print format: page margins
         $spreadsheet->getActiveSheet()->getPageMargins()->setTop(1);
         $spreadsheet->getActiveSheet()->getPageMargins()->setRight(0.75);
         $spreadsheet->getActiveSheet()->getPageMargins()->setLeft(0.75);
         $spreadsheet->getActiveSheet()->getPageMargins()->setBottom(1);
 
-        // 设置打印格式：居中
+        // Set print format: centering
         $spreadsheet->getActiveSheet()->getPageSetup()->setHorizontalCentered(true);
         $spreadsheet->getActiveSheet()->getPageSetup()->setVerticalCentered(false);
 
-        // 打印格式：页眉页脚
+        // Print format: header and footer
             $spreadsheet->getActiveSheet()->getHeaderFooter()
             ->setOddHeader('&C&HPlease treat this document as confidential!');
         $spreadsheet->getActiveSheet()->getHeaderFooter()
             ->setOddFooter('&L&B' . $spreadsheet->getProperties()->getTitle() . '&RPage &P of &N');
 
-        // 打印格式：设置打印区域
+        // Print format: set print area
         $spreadsheet->getActiveSheet()->getPageSetup()->setPrintArea('A1:E5');
 
-        // 设置单元格格式
+        // Set cell style
         $spreadsheet->getActiveSheet()->getStyle('B2')
             ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED);
         $spreadsheet->getActiveSheet()->getStyle('B2')
@@ -156,11 +156,11 @@ class Test extends Controller
             ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $spreadsheet->getActiveSheet()->getStyle('B2')
             ->getFill()->getStartColor()->setARGB('FFFF0000');
-        // 设置多个单元格格式（推荐）
+        // Set multiple cell styles (recommended)
         $spreadsheet->getActiveSheet()->getStyle('B3:B7')->getFill()
         ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
         ->getStartColor()->setARGB('FFFF0000');
-        // 通过数组设置（设置数量很多的时候有性能优势）
+        // Set via array (better performance for many styles)
         $styleArray = [
             'font' => [
                 'bold' => true,
@@ -185,13 +185,13 @@ class Test extends Controller
             ],
         ];
         $spreadsheet->getActiveSheet()->getStyle('A3')->applyFromArray($styleArray);
-        // 设置默认样式
+        // Set default styles
         $spreadsheet->getDefaultStyle()->getFont()->setName('Arial');
         $spreadsheet->getDefaultStyle()->getFont()->setSize(8);
         $spreadsheet->getActiveSheet()->getDefaultColumnDimension()->setWidth(12);
         $spreadsheet->getActiveSheet()->getDefaultRowDimension()->setRowHeight(15);
 
-        // 条件样式
+        // Conditional styles
         $conditional1 = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional1->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_CELLIS);
         $conditional1->setOperatorType(\PhpOffice\PhpSpreadsheet\Style\Conditional::OPERATOR_LESSTHAN);
@@ -209,27 +209,27 @@ class Test extends Controller
         $conditionalStyles[] = $conditional2;
         $spreadsheet->getActiveSheet()->getStyle('B2')->setConditionalStyles($conditionalStyles);
 
-        // 重用样式
+        // Reuse styles
         $spreadsheet->getActiveSheet()
         ->duplicateStyle(
             $spreadsheet->getActiveSheet()->getStyle('B2'),
             'B3:B7'
         );
 
-        // 设置列过滤
+        // Set column filter
         $spreadsheet->getActiveSheet()->setAutoFilter('A1:C9');
 
-        // 设置列宽度
+        // Set column width
         $spreadsheet->getActiveSheet()->getColumnDimension('D')->setWidth(12);
-        $spreadsheet->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);// 自动宽度
+        $spreadsheet->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);// Auto width
 
-        // 设置行高
-        $spreadsheet->getActiveSheet()->getRowDimension('10')->setRowHeight(100);//默认是 12.75 pts
+        // Set row height
+        $spreadsheet->getActiveSheet()->getRowDimension('10')->setRowHeight(100);// Default is 12.75 pts
 
-        // 合并单元格
+        // Merge cells
         $spreadsheet->getActiveSheet()->mergeCells('A18:E22');
 
-        // 添加图片
+        // Add image
         //Use GD to create an in-memory image
         $gdImage = @imagecreatetruecolor(120, 20) or die('Cannot Initialize new GD image stream');
         $textColor = imagecolorallocate($gdImage, 255, 255, 255);
@@ -248,7 +248,7 @@ class Test extends Controller
         $drawing->setWorksheet($spreadsheet->getActiveSheet());
 
 
-        // 数据格式化
+        // Data formatting
         $spreadsheet->getActiveSheet()->getStyle('A1')->getNumberFormat()
         ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
@@ -280,171 +280,171 @@ class Test extends Controller
     {
         $data = [
             [
-                'name' => '张三',
+                'name' => 'Zhang San',
                 'age' => mt_rand(10, 100).'',
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'front_end',
             ],
             [
-                'name' => '张四',
+                'name' => 'Zhang Si',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'front_end',
             ],
             [
-                'name' => '张五',
+                'name' => 'Zhang Wu',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'back_end',
             ],
             [
-                'name' => '张六',
+                'name' => 'Zhang Liu',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'back_end',
             ],
             [
-                'name' => '张七',
+                'name' => 'Zhang Qi',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'back_end',
             ],
             [
-                'name' => '张八',
+                'name' => 'Zhang Ba',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'back_end',
             ],
             [
-                'name' => '张九',
+                'name' => 'Zhang Jiu',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'os',
             ],
             [
-                'name' => '张十',
+                'name' => 'Zhang Shi',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'os',
             ],
             [
-                'name' => '张十一',
+                'name' => 'Zhang Shiyi',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'os',
             ],
             [
-                'name' => '张十二',
+                'name' => 'Zhang Shier',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'pos',
             ],
             [
-                'name' => '张十三',
+                'name' => 'Zhang Shisan',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'pos',
             ],
             [
-                'name' => '张十四',
+                'name' => 'Zhang Shisi',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'screen',
             ],
             [
-                'name' => '张十五',
+                'name' => 'Zhang Shiwu',
                 'age' => mt_rand(10, 100),
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'screen',
             ],
             [
-                'name' => '张十六',
+                'name' => 'Zhang Shiliu',
                 'age' => 12345678901,
-                'sex' => '男',
-                'love_in' => '乒乓球',
-                'love_out_land' => '跑步',
-                'love_out_sky' => '跳伞',
-                'city' => ['深圳', '上海'][mt_rand(0,1)],
-                'area' => '区域名称',
-                'building' => '小区名',
+                'sex' => 'Male',
+                'love_in' => 'Table Tennis',
+                'love_out_land' => 'Running',
+                'love_out_sky' => 'Skydiving',
+                'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+                'area' => 'Area Name',
+                'building' => 'Community',
                 '_row_head_' => 'screen',
             ],
         ];
@@ -452,15 +452,15 @@ class Test extends Controller
         // $data = [];
         // for ($i = 0; $i < 1000; $i++) {
         //     $data[] = [
-        //         'name' => "张三{$i}-{$page}",
+        //         'name' => "Zhang San{$i}-{$page}",
         //         'age' => mt_rand(10, 100),
-        //         'sex' => ['男', '女'][mt_rand(0,1)],
-        //         'love_in' => ['乒乓球', '羽毛球'][mt_rand(0,1)],
-        //         'love_out_land' => ['跑步', '爬山'][mt_rand(0,1)],
-        //         'love_out_sky' => '跳伞',
-        //         'city' => ['深圳', '上海'][mt_rand(0,1)],
-        //         'area' => '区域名称',
-        //         'building' => '小区名'
+        //         'sex' => ['Male', 'Female'][mt_rand(0,1)],
+        //         'love_in' => ['Table Tennis', 'Badminton'][mt_rand(0,1)],
+        //         'love_out_land' => ['Running', 'Hiking'][mt_rand(0,1)],
+        //         'love_out_sky' => 'Skydiving',
+        //         'city' => ['Shenzhen', 'Shanghai'][mt_rand(0,1)],
+        //         'area' => 'Area Name',
+        //         'building' => 'Community'
         //     ];
         // }
 //        $force = mt_rand(0, 10);
@@ -470,34 +470,34 @@ class Test extends Controller
 //                'force_continue' => $force,
 //            "data" => [
 //                [
-//                    "name" => '按',
+//                    "name" => 'An',
 //                    "age" => 43
 //                ]
 //            ],
 //            'data' => [],
 //            'total' => 0,
-            // 'header' => ["油站" => '钓鱼岛', '日期' => date('Y-m-d')],
-            // 'footer' => ['负责人' => '松林', '总监签名' => '', 'CEO 签名' => ''],
-//            'template' => ['name' => '姓名', 'sex' => '性别']
+            // 'header' => ["Station" => 'Diaoyudao', 'Date' => date('Y-m-d')],
+            // 'footer' => ['Manager' => 'Songlin', 'Director Signature' => '', 'CEO Signature' => ''],
+//            'template' => ['name' => 'Name', 'sex' => 'Gender']
 //             'template' => [
 //                 'row' => [
 //                     [
-//                         'title' => '云研发',
+//                         'title' => 'Cloud R&D',
 //                         'children' => [
 //                             [
 //                                 'name' => 'front_end',
-//                                 'title' => '前端',
+//                                 'title' => 'Frontend',
 //                                 'row_count' => 2,
 //                             ],
 //                             [
 //                                 'name' => 'back_end',
-//                                 'title' => '后端',
+//                                 'title' => 'Backend',
 //                                 'row_count' => 4,
 //                             ],
 //                         ]
 //                     ],
 //                     [
-//                         'title' => 'OS及智能设备',
+//                         'title' => 'OS & Smart Devices',
 //                         'children' => [
 //                             [
 //                                 'title' => 'OS',
@@ -505,16 +505,16 @@ class Test extends Controller
 //                                 'row_count' => 3,
 //                             ],
 //                             [
-//                                 'title' => '智能设备',
+//                                 'title' => 'Smart Devices',
 //                                 'children' => [
 //                                     [
 //                                         'name' => 'pos',
-//                                         'title' => '手持终端',
+//                                         'title' => 'Handheld Terminal',
 //                                         'row_count' => 2,
 //                                     ],
 //                                     [
 //                                         'name' => 'screen',
-//                                         'title' => '大屏',
+//                                         'title' => 'Large Screen',
 //                                         'row_count' => 3,
 //                                     ],
 //                                 ]
@@ -524,46 +524,46 @@ class Test extends Controller
 //                 ],
 //                 'col' => [
 //                     [
-//                         'title' => '人员',
+//                         'title' => 'Person',
 //                         'children' => [
 //                             [
 //                                 'name' => 'name',
-//                                 'title' => '姓名',
+//                                 'title' => 'Name',
 //                                 'type' => 'string',
 //                                 'color' => 'red',
 //                                 "width" => -1
 //                             ],
 //                             [
-//                                 'title' => '其它',
+//                                 'title' => 'Other',
 //                                 'children' => [
 //                                     [
 //                                         'name' => 'age',
-//                                         'title' => '年龄',
+//                                         'title' => 'Age',
 //                                         'type' => 'number',
 //                                     ],
 //                                     [
 //                                         'name' => 'sex',
-//                                         'title' => '性别',
+//                                         'title' => 'Gender',
 //                                         'type' => 'string',
 //                                         'width' => 8,
 //                                     ],
 //                                     [
-//                                         'title' => '爱好',
+//                                         'title' => 'Hobbies',
 //                                         'children' => [
 //                                             [
 //                                                 'name' => 'love_in',
-//                                                 'title' => '室内',
+//                                                 'title' => 'Indoor',
 //                                             ],
 //                                             [
-//                                                 'title' => '室外',
+//                                                 'title' => 'Outdoor',
 //                                                 'children' => [
 //                                                     [
 //                                                         'name' => 'love_out_land',
-//                                                         'title' => '陆地',
+//                                                         'title' => 'Land',
 //                                                     ],
 //                                                     [
 //                                                         'name' => 'love_out_sky',
-//                                                         'title' => '空中',
+//                                                         'title' => 'Sky',
 //                                                     ],
 //                                                 ]
 //                                             ],
@@ -574,22 +574,22 @@ class Test extends Controller
 //                         ]
 //                     ],
 //                     [
-//                         'title' => '住址',
+//                         'title' => 'Address',
 //                         'children' => [
 //                             [
 //                                 'name' => 'city',
-//                                 'title' => '城市'
+//                                 'title' => 'City'
 //                             ],
 //                             [
-//                                 'title' => '小区',
+//                                 'title' => 'Community',
 //                                 'children' => [
 //                                     [
 //                                         'name' => 'area',
-//                                         'title' => '区域',
+//                                         'title' => 'Area',
 //                                     ],
 //                                     [
 //                                         'name' => 'building',
-//                                         'title' => '楼盘',
+//                                         'title' => 'Building',
 //                                     ]
 //                                 ]
 //                             ]
@@ -597,22 +597,22 @@ class Test extends Controller
 //                     ],
 //                 ],
 //                 'col_' => [
-//                     'name' => '名字',
-//                     'age' => '年龄',
-//                     'sex' => '性别',
-//                     'love_in' => '室内爱好',
-//                     'love_out_land' => '室外陆地爱好',
-//                     'love_out_sky' => '室外空中爱好',
-//                     'city' => '城市',
-//                     'area' => '区域',
-//                     'building' => '小区',
+//                     'name' => 'Name',
+//                     'age' => 'Age',
+//                     'sex' => 'Gender',
+//                     'love_in' => 'Indoor Hobby',
+//                     'love_out_land' => 'Outdoor Land Hobby',
+//                     'love_out_sky' => 'Outdoor Sky Hobby',
+//                     'city' => 'City',
+//                     'area' => 'Area',
+//                     'building' => 'Community',
 //                 ]
 //             ]
         ]);
     }
 
     /**
-     * 测试创建大文件
+     * Test creating large file
      */
     public function createBigFile()
     {
@@ -620,25 +620,25 @@ class Test extends Controller
         $f = fopen(File::join(STORAGE_ROOT, "temp/big_file.csv"), 'w');
         
         for ($i = 0; $i < 6000000; $i++) {
-            fputcsv($f, ["张松林","张松林","张松林","张松林","张松林","张松林","张松林","张松林","张松林","张松林","张松林","张松林","张松林",]);
+            fputcsv($f, ["Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin","Zhang Songlin",]);
         }
         fclose($f);
     }
 
     /**
-     * 测试下载大文件
+     * Test downloading large file
      */
     public function download()
     {
         set_time_limit(0);
         $fileName = File::join(STORAGE_ROOT, "temp/big_file.csv");
-        $title = "测试大文件.csv";
+        $title = "test_large_file.csv";
         $this->response()->withHeader("Content-Disposition", "attachment; filename=$title");
         $this->response()->sendFile($fileName);
     }
 
     /**
-     * 测试上传到oss
+     * Test upload to OSS
      */
     public function upload()
     {
@@ -651,14 +651,14 @@ class Test extends Controller
     }
 
     /**
-     * 测试同步下载
+     * Test synchronous download
      */
     public function testSyncDownload()
     {
         $params = [
             'source_url' => Url::assemble('/v1/test/source', 'http://localhost:9588'),
             'project_id' => 'bf1fd528-b505-baef-c19b-865f98ae6048',
-            'name' => '测试任务',
+            'name' => 'Test Task',
             'type' => 'excel',
         ];
         $url = "http://localhost:9588/v1/download/sync?".http_build_query($params);
@@ -677,7 +677,7 @@ class Test extends Controller
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_TIMEOUT , 60);
-        // 自定义流处理函数
+        // Custom stream handler
         curl_setopt($curl, CURLOPT_WRITEFUNCTION, array($this, 'streamingWriteCallback'));
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_exec($curl);

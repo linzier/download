@@ -40,7 +40,7 @@ class TaskTest extends TestCase
     }
 
     /**
-     * Task 对象的创建
+     * Task object creation
      */
     public function testCreate()
     {
@@ -50,7 +50,7 @@ class TaskTest extends TestCase
     }
 
     /**
-     * 状态切换
+     * Status switching
      */
     public function testSwitchStatus()
     {

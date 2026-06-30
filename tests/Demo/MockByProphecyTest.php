@@ -7,7 +7,7 @@ use Prophecy\Prophet;
 use Test\Demo\Sample\SomeClass;
 
 /**
- * 使用 Prophecy 创建 Mock
+ * Using Prophecy to Create Mocks
  * Class MockByProphecyTest
  * @package Test\Demo
  */

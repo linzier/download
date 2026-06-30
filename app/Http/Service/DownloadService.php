@@ -12,8 +12,8 @@ use EasySwoole\Http\Response;
 use WecarSwoole\Exceptions\Exception;
 
 /**
- * 下载服务
- * 应用层服务
+ * Download service
+ * Application layer service
  */
 class DownloadService
 {
@@ -35,12 +35,12 @@ class DownloadService
     }
 
     /**
-     * 下载文件
+     * Download file
      */
     public function download(string $taskId, Response $response)
     {
         if (!$task = $this->taskRepository->getTaskById($taskId)) {
-            throw new Exception("任务不存在：{$taskId}", ErrCode::DOWNLOAD_FAILED);
+            throw new Exception("Task does not exist: {$taskId}", ErrCode::DOWNLOAD_FAILED);
         }
 
         $localFile = $this->transferService->download($task);
@@ -48,7 +48,7 @@ class DownloadService
     }
 
     /**
-     * 通过 ticket 下载资源
+     * Download resource via ticket
      */
     public function downloadWithTicket(string $ticketId, Response $response)
     {
@@ -64,7 +64,7 @@ class DownloadService
     }
 
     /**
-     * 同步下载文件（任务投递和下载一体化，用于下载小文件）
+     * Synchronous file download (combines task submission and download, used for small files)
      */
     public function syncDownload(TaskDTO $taskDTO, Response $response)
     {

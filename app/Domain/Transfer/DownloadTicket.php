@@ -5,7 +5,7 @@ namespace App\Domain\Transfer;
 use WecarSwoole\Entity;
 
 /**
- * 生成临时下载 url 用的 ticket
+ * Download ticket used for generating temporary download URLs
  */
 class DownloadTicket extends Entity
 {

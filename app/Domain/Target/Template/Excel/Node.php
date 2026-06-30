@@ -3,7 +3,7 @@
 namespace App\Domain\Target\Template\Excel;
 
 /**
- * 表格节点
+ * Table node
  */
 class Node
 {
@@ -12,7 +12,7 @@ class Node
     protected $name;
     protected $title;
     /**
-     * 节点在树中的绝对位置：[行数(深度), 列数(广度)]，从 0 开始编号
+     * Absolute position of the node in the tree: [row (depth), column (breadth)], indexed from 0
      */
     protected $pos = [0, 0];
     /**
@@ -47,7 +47,7 @@ class Node
     }
 
     /**
-     * 是否叶子节点
+     * Whether this is a leaf node
      */
     public function isLeaf(): bool
     {
@@ -70,7 +70,7 @@ class Node
     }
 
     /**
-     * 获取节点在树中的位置
+     * Get the node's position in the tree
      */
     public function getPosition(): array
     {
@@ -78,7 +78,7 @@ class Node
     }
 
     /**
-     * 树深度
+     * Tree depth
      */
     public function deep(): int
     {
@@ -86,7 +86,7 @@ class Node
     }
 
     /**
-     * 树广度
+     * Tree breadth
      */
     public function breadth(): int
     {
@@ -94,7 +94,7 @@ class Node
     }
 
     /**
-     * 根据节点名称查找节点
+     * Search for a node by name
      */
     public function search(string $name): ?Node
     {
@@ -102,9 +102,9 @@ class Node
     }
 
     /**
-     * 获取某结点的所有叶子节点，返回数组
+     * Get all leaf nodes of a given node
      * @param Node $node
-     * @return Node[] 叶子节点数组
+     * @return Node[] Array of leaf nodes
      */
     public static function fetchAllLeaves(Node $node): array
     {
@@ -131,7 +131,7 @@ class Node
         }
 
         foreach ($node->children() as $childNode) {
-            // 只要找到则立即返回，不再继续查找
+            // Return immediately once found; do not continue searching
             if ($theNode = $this->searchNode($name, $childNode)) {
                 return $theNode;
             }
@@ -141,7 +141,7 @@ class Node
     }
 
     /**
-     * 深度探测：取各条线路探测结果的最大值
+     * Depth detection: take the maximum value across all branches
      */
     protected function detectDeep(Node $node, int $deep = 1): int
     {
@@ -158,7 +158,7 @@ class Node
     }
 
     /**
-     * 广度探测：遇到一个没有 children 的节点则广度加 1
+     * Breadth detection: increment breadth by 1 for each node without children
      */
     protected function detectBreadth(Node $node, int &$breadth = 0): int
     {

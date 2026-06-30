@@ -6,12 +6,12 @@ use App\ErrCode;
 use WecarSwoole\Exceptions\Exception;
 
 /**
- * 表格模板工厂
+ * Table template builder
  */
 trait TplBuilder
 {
     /**
-     * @param array|string $tplCfg 模板配置
+     * @param array|string $tplCfg Template configuration
      */
     public static function build($tplCfg): ?Tpl
     {
@@ -28,7 +28,7 @@ trait TplBuilder
         }
 
         if (!isset($tplCfg['col']) && isset($tplCfg['row'])) {
-            throw new Exception("模板格式不合法", ErrCode::TPL_FMT_ERR);
+            throw new Exception("Invalid template format", ErrCode::TPL_FMT_ERR);
         }
 
         $rowCfg = self::formatConf($tplCfg['row'] ?? []);
@@ -41,11 +41,11 @@ trait TplBuilder
     }
 
     /**
-     * 格式化配置数组
+     * Format configuration array
      */
     public static function formatConf(array $conf): array
     {
-        // 如果是一维数组，格式化为二维数组
+        // If it is a 1D array, convert to 2D array
         if (!is_array(reset($conf))) {
             $newConf = [];
             foreach ($conf as $key => $val) {
@@ -69,7 +69,7 @@ trait TplBuilder
     private static function buildColHead(array $colCfg): ColHead
     {
         if (!$colCfg) {
-            throw new Exception("模板格式错误：缺少列标题配置", ErrCode::TPL_FMT_ERR);
+            throw new Exception("Template format error: missing column header configuration", ErrCode::TPL_FMT_ERR);
         }
 
         return ColHead::parse($colCfg);

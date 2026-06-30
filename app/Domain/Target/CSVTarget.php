@@ -3,7 +3,7 @@
 namespace App\Domain\Target;
 
 /**
- * 目标文件：CSV
+ * Target file: CSV
  */
 class CSVTarget extends Target
 {

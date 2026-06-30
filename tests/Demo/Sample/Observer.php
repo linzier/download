@@ -6,11 +6,11 @@ class Observer
 {
     public function update($argument)
     {
-        // 做点什么。
+        // Do something.
     }
 
     public function reportError($errorCode, $errorMessage, Subject $subject)
     {
-        // 做点什么。
+        // Do something.
     }
 }

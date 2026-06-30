@@ -6,7 +6,7 @@ use App\Domain\Target\ExcelTarget;
 use WecarSwoole\DTO;
 
 /**
- * 数据传输对象，给外部传参用
+ * Data Transfer Object, used for passing parameters externally
  */
 class TaskDTO extends DTO
 {
@@ -18,7 +18,7 @@ class TaskDTO extends DTO
     public $projectId;
     public $fileName;
     public $type;
-    public $multiType;// 多表格类型：page、tab、single（单表格模式，默认）
+    public $multiType;// Multi-sheet type: page, tab, single (single-sheet mode, default)
     public $callback;
     public $step;
     public $operatorId;
@@ -32,10 +32,10 @@ class TaskDTO extends DTO
     public $headerAlign;
     public $footerAlign;
     public $isSync;
-    public $defaultWidth;// Excel 默认列宽度，单位 pt
-    public $defaultHeight;// Excel 默认行高，单位 pt
-    public $maxExecTime;// 任务处理时限（超过该时限还在“处理中”的任务将重新入列）
-    public $interval;// 两次拉取之间间隔多少毫秒，取值 100 ~ 3000（0.1秒到3秒）
+    public $defaultWidth;// Default Excel column width, in pt
+    public $defaultHeight;// Default Excel row height, in pt
+    public $maxExecTime;// Task processing time limit (tasks still "in progress" beyond this limit will be re-enqueued)
+    public $interval;// Interval in milliseconds between two fetches, valid range: 100 ~ 3000 (0.1s to 3s)
     public $rowoffset;
 
     public function __construct(array $data = [])
@@ -50,10 +50,10 @@ class TaskDTO extends DTO
             $this->template = json_decode($this->template, true);
         }
 
-        // 将历史参数 source_url、source_data 都合并到 source 里面去
+        // Merge legacy parameters source_url and source_data into source
         if (!$this->source) {
             if ($this->sourceData) {
-                // 优先看 sourceData
+                // Prioritize sourceData
                 $data = is_string($this->sourceData) ? json_decode($this->sourceData, true) : $this->sourceData;
                 $this->source = $data;
             } else {
@@ -61,7 +61,7 @@ class TaskDTO extends DTO
             }
         }
 
-        // 多表格模式下 source 必须是数组
+        // In multi-sheet mode, source must be an array
         if ($this->multiType != ExcelTarget::MT_SINGLE && is_string($this->source)) {
             $this->source = json_decode($this->source, true);
         }

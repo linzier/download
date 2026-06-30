@@ -4,20 +4,20 @@ use WecarSwoole\Client\Http\Component\WecarHttpRequestAssembler;
 use WecarSwoole\Client\Http\Component\JsonResponseParser;
 
 /**
- * 喂车内部子系统 api 定义
+ * Weicheche internal subsystem API definitions
  */
 return [
     'config' => [
         'http' => [
-            // 请求参数组装器
+            // Request parameter assembler
             'request_assembler' => WecarHttpRequestAssembler::class,
-            // 响应参数解析器
+            // Response parameter parser
             'response_parser' => JsonResponseParser::class,
         ]
     ],
-    // api 定义
+    // API definitions
     'api' => [
-        // 不要删这个，告警短信用到
+        // Do not remove this, used for alert SMS
         'sms.send' => [
             'server' => 'DX',
             'path' => 'v1.0/sms/send',

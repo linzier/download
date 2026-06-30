@@ -8,11 +8,13 @@ use Psr\Log\LoggerInterface;
 use WecarSwoole\Container;
 
 /**
- * 工作流节点处理器基类
- * 采用职责链模式实现
- * 每个处理程序检查是否需要处理当前的任务，如果不需要处理，则交给下一个处理程序，如果需要自己处理，则处理，处理后不再交给后面的处理程序
- * 注意：处理程序本身不要写具体的业务实现代码，业务实现由领域层类实现，处理程序根据领域层执行情况通知后续状态
- * 工作流节点本身可以采用子协程并发、异步 task 等方式执行任务
+ * Base class for workflow handler nodes.
+ * Implements the chain of responsibility pattern.
+ * Each handler checks whether it should process the current status; if not, it delegates to the next handler.
+ * If it handles the request, processing stops and the request is not passed further down the chain.
+ * Note: Handlers should not contain business logic directly; business logic belongs in the domain layer.
+ * Handlers notify the workflow of the next status based on domain layer execution results.
+ * Handler nodes may use coroutine concurrency, async task workers, or other mechanisms to execute tasks.
  */
 abstract class WorkHandler
 {
@@ -31,7 +33,7 @@ abstract class WorkHandler
     }
 
     /**
-     * 设置下游处理程序
+     * Set the downstream handler
      */
     public function setSuccessor(WorkHandler $successor)
     {
@@ -39,25 +41,25 @@ abstract class WorkHandler
     }
 
     /**
-     * 处理逻辑
-     * @param int $workStatus 工作流执行状态
+     * Handle the workflow status
+     * @param int $workStatus Workflow execution status
      */
     public function handle(int $workStatus)
     {
         if ($this->handleStatus() !== $workStatus) {
-            // 本处理程序不需要处理，交给下游
+            // This handler does not handle the current status; delegate to the next handler
             $this->successor->handle($workStatus);
             return;
         }
 
-        // 自己能处理，则处理掉，同时不再传递给下游
-        Container::get(LoggerInterface::class)->info("处理任务{$this->workFlow->task()->id()}的状态{$workStatus}");
+        // This handler can handle the status; process it without passing downstream
+        Container::get(LoggerInterface::class)->info("Handling task {$this->workFlow->task()->id()} status {$workStatus}");
         $this->exec();
     }
 
     /**
-     * 每个处理程序负责处理的工作流节点状态
-     * 只有符合自己状态的处理请求到来时才会处理
+     * The workflow status this handler is responsible for.
+     * Only processes requests matching its own status.
      */
     abstract public function handleStatus(): int;
 
@@ -72,7 +74,7 @@ abstract class WorkHandler
     }
 
     /**
-     * 每个处理程序具体的处理逻辑
+     * Concrete processing logic for each handler
      */
     abstract protected function exec();
 }

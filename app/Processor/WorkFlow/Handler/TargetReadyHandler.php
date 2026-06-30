@@ -8,7 +8,7 @@ use WecarSwoole\Container;
 use Psr\Log\LoggerInterface;
 
 /**
- * 目标文件就绪处理程序
+ * Target file ready handler
  */
 class TargetReadyHandler extends WorkHandler
 {
@@ -18,7 +18,7 @@ class TargetReadyHandler extends WorkHandler
     }
 
     /**
-     * 上传到存储服务器
+     * Upload to the storage server
      */
     protected function exec()
     {

@@ -5,48 +5,48 @@ namespace App\Domain\Source;
 use App\Foundation\Client\API;
 
 /**
- * 数据源接口
+ * Data Source Interface
  */
 interface ISource
 {
-    // 单源模式（针对单表格）
+    // Single source mode (for single table)
     public const SOURCE_TYPE_SIMPLE = 1;
-    // 多源模式（针对多表格或者多 tab）
+    // Multi-source mode (for multiple tables or tabs)
     public const SOURCE_TYPE_MULTI = 2;
-    // 两次拉取之间默认时间间隔，单位毫秒
+    // Default time interval between two fetches, in milliseconds
     public const DEFAULT_INTERVAL = 100;
 
     /**
-     * 源文件名称（包含目录）
+     * Source file name (including directory)
      */
     public function fileName(): string;
 
     /**
-     * 数据源列表
+     * Data source list
      * @return array
      */
     public function srcs(): array;
 
     /**
-     * 数据记录数（行数）
+     * Number of data records (rows)
      */
     public function count(): int;
 
     /**
-     * 源文件大小，单位字节
+     * Source file size in bytes
      */
     public function size(): int;
 
     /**
-     * 拉取源数据的时间间隔
+     * Time interval for fetching source data
      * @return int
      */
     public function interval(): int;
 
     /**
-     * 从源拉取数据并保存到本地
-     * @param API $invoker 源数据调用程序
-     * @param string $targetType 目标文件类型
+     * Fetch data from the source and save it locally
+     * @param API $invoker Source data invoker
+     * @param string $targetType Target file type
      */
     public function fetch(API $invoker, string $targetType);
 }

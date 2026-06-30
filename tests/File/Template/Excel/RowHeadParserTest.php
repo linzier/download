@@ -16,26 +16,26 @@ class RowHeadParserTest extends TestCase
     {
         $cfgStr = '[{
             "name": "money",
-            "title": "标题1",
+            "title": "Title 1",
             "bg_color": "white",
             "children": [
                 {
                     "name": "money",
-                    "title": "标题21",
+                    "title": "Title 21",
                     "bg_color": "white",
                     "children": [{
                         "name": "money",
-                        "title": "标题3",
+                        "title": "Title 3",
                         "bg_color": "white"
                     }]
                 },
                 {
                     "name": "money",
-                    "title": "标题22",
+                    "title": "Title 22",
                     "bg_color": "white",
                     "children": [{
                         "name": "money",
-                        "title": "标题3",
+                        "title": "Title 3",
                         "bg_color": "white"
                     }]
                 }
@@ -46,9 +46,9 @@ class RowHeadParserTest extends TestCase
          * @var ColHead
          */
         $row = RowHeadParser::getInstance()->parse($cfg);
-        $this->assertEquals($row->title(), '标题1');
+        $this->assertEquals($row->title(), 'Title 1');
         $this->assertEquals(count($row->children()), 2);
-        $this->assertEquals($row->children()[0]->title(), '标题21');
-        $this->assertEquals($row->children()[0]->children()[0]->title(), '标题3');
+        $this->assertEquals($row->children()[0]->title(), 'Title 21');
+        $this->assertEquals($row->children()[0]->children()[0]->title(), 'Title 3');
     }
 }
