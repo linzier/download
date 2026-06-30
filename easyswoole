@@ -18,13 +18,13 @@ if (file_exists($file)) {
 defined('STORAGE_ROOT') or define('STORAGE_ROOT', File::join(EASYSWOOLE_ROOT, 'storage'));
 defined('CONFIG_ROOT') or define('CONFIG_ROOT', File::join(EASYSWOOLE_ROOT, 'config'));
 
-// 应用的常量定义
+// Application constant definitions
 include_once EASYSWOOLE_ROOT . '/constant.php';
 
 $args = $argv;
 array_shift($args);
 
-// 环境常量定义
+// Environment constant definitions
 if (!defined('ENVIRON')) {
     $env = 'dev';
     foreach ($args as $param) {
@@ -58,17 +58,17 @@ if (in_array('-d', $args)) {
     $args[] = 'd';
 }
 
-// 是否要启动定时任务
+// Whether to start cron tasks
 if (in_array('--crontab', $args)) {
     define('WECARSWOOLE_CRON', 1);
 }
 
-// 是否master server
+// Whether this is master server
 if (in_array('--master', $args)) {
     define('WECARSWOOLE_MASTER', 1);
 }
 
-// 是否调试模式
+// Whether in debug mode
 !defined('DEBUG_MODEL') && define('DEBUG_MODEL', !in_array('d', $args) && in_array('--debug', $args));
 
 $ret = CommandRunner::getInstance()->run($args);
