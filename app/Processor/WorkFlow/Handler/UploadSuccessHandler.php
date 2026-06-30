@@ -10,7 +10,7 @@ use WecarSwoole\Util\Url;
 use Psr\Log\LoggerInterface;
 
 /**
- * 目标文件上传成功处理程序
+ * Upload success handler
  */
 class UploadSuccessHandler extends WorkHandler
 {
@@ -20,7 +20,7 @@ class UploadSuccessHandler extends WorkHandler
     }
 
     /**
-     * 通知客户端
+     * Notify the client
      */
     protected function exec()
     {

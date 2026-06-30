@@ -3,15 +3,15 @@
 namespace App\Foundation\File;
 
 /**
- * 文件压缩接口
+ * File compression interface
  */
 interface ICompress
 {
     /**
-     * @param string $archiveFileName 归档后文件
-     * @param array $origFileNames 要归档的文件数组
-     * @param bool $delOrigFile 归档后是否删除源文件
-     * @return string 归档后的文件名
+     * @param string $archiveFileName Archived file name
+     * @param array $origFileNames Array of files to archive
+     * @param bool $delOrigFile Whether to delete source files after archiving
+     * @return string The archived file name
      */
     public function compress(string $archiveFileName, array $origFileNames, bool $delOrigFile = true): string;
 }

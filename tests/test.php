@@ -5,22 +5,22 @@ include "./base.php";
 $a = [
     'row' => [
         [
-            'title' => '云研发',
+            'title' => 'Cloud R&D',
             'children' => [
                 [
                     'name' => 'front_end',
-                    'title' => '前端',
+                    'title' => 'Frontend',
                     'row_count' => 2,
                 ],
                 [
                     'name' => 'back_end',
-                    'title' => '后端',
+                    'title' => 'Backend',
                     'row_count' => 4,
                 ],
             ]
         ],
         [
-            'title' => 'OS及智能设备',
+            'title' => 'OS & Smart Devices',
             'children' => [
                 [
                     'title' => 'OS',
@@ -28,16 +28,16 @@ $a = [
                     'row_count' => 3,
                 ],
                 [
-                    'title' => '智能设备',
+                    'title' => 'Smart Devices',
                     'children' => [
                         [
                             'name' => 'pos',
-                            'title' => '手持终端',
+                            'title' => 'Handheld Terminal',
                             'row_count' => 2,
                         ],
                         [
                             'name' => 'screen',
-                            'title' => '大屏',
+                            'title' => 'Large Screen',
                             'row_count' => 3,
                         ],
                     ]
@@ -47,46 +47,46 @@ $a = [
     ],
     'col' => [
         [
-            'title' => '人员',
+            'title' => 'Personnel',
             'children' => [
                 [
                     'name' => 'name',
-                    'title' => '姓名',
+                    'title' => 'Name',
                     'type' => 'string',
                     'color' => 'red',
                     "width" => -1
                 ],
                 [
-                    'title' => '其它',
+                    'title' => 'Other',
                     'children' => [
                         [
                             'name' => 'age',
-                            'title' => '年龄',
+                            'title' => 'Age',
                             'type' => 'number',
                         ],
                         [
                             'name' => 'sex',
-                            'title' => '性别',
+                            'title' => 'Gender',
                             'type' => 'string',
                             'width' => 8,
                         ],
                         [
-                            'title' => '爱好',
+                            'title' => 'Hobbies',
                             'children' => [
                                 [
                                     'name' => 'love_in',
-                                    'title' => '室内',
+                                    'title' => 'Indoor',
                                 ],
                                 [
-                                    'title' => '室外',
+                                    'title' => 'Outdoor',
                                     'children' => [
                                         [
                                             'name' => 'love_out_land',
-                                            'title' => '陆地',
+                                            'title' => 'Land',
                                         ],
                                         [
                                             'name' => 'love_out_sky',
-                                            'title' => '空中',
+                                            'title' => 'Sky',
                                         ],
                                     ]
                                 ],
@@ -97,22 +97,22 @@ $a = [
             ]
         ],
         [
-            'title' => '住址',
+            'title' => 'Address',
             'children' => [
                 [
                     'name' => 'city',
-                    'title' => '城市'
+                    'title' => 'City'
                 ],
                 [
-                    'title' => '小区',
+                    'title' => 'Community',
                     'children' => [
                         [
                             'name' => 'area',
-                            'title' => '区域',
+                            'title' => 'Area',
                         ],
                         [
                             'name' => 'building',
-                            'title' => '楼盘',
+                            'title' => 'Building',
                         ]
                     ]
                 ]
@@ -120,15 +120,15 @@ $a = [
         ],
     ],
     'col_' => [
-        'name' => '名字',
-        'age' => '年龄',
-        'sex' => '性别',
-        'love_in' => '室内爱好',
-        'love_out_land' => '室外陆地爱好',
-        'love_out_sky' => '室外空中爱好',
-        'city' => '城市',
-        'area' => '区域',
-        'building' => '小区',
+        'name' => 'Name',
+        'age' => 'Age',
+        'sex' => 'Gender',
+        'love_in' => 'Indoor Hobbies',
+        'love_out_land' => 'Outdoor Land Hobbies',
+        'love_out_sky' => 'Outdoor Sky Hobbies',
+        'city' => 'City',
+        'area' => 'Area',
+        'building' => 'Community',
     ]
 ];
 

@@ -8,7 +8,7 @@ use WecarSwoole\Exceptions\Exception;
 use WecarSwoole\Util\File;
 
 /**
- * 本地文件
+ * Local file
  */
 class LocalFile
 {
@@ -29,21 +29,21 @@ class LocalFile
     }
 
     /**
-     * 存储数据到 csv 文件
-     * @param array $dataList 一维或二维数组
+     * Save data to a CSV file
+     * @param array $dataList One-dimensional or two-dimensional array
      */
     public function saveAsCsv(array $dataList)
     {
         $dataList = self::formatDataList($dataList);
         foreach ($dataList as $item) {
             if (fputcsv($this->file, $item) === false) {
-                throw new FileException("写入csv文件失败:{$this->fileName}", ErrCode::FILE_OP_FAILED);
+                throw new FileException("Failed to write CSV file: {$this->fileName}", ErrCode::FILE_OP_FAILED);
             }
         }
     }
 
     /**
-     * 文件大小
+     * File size
      */
     public function size(): int
     {
@@ -57,8 +57,8 @@ class LocalFile
     }
 
     /**
-     * 删除目录（包括目录里面的文件）
-     * @return bool 删除成功返回 true，失败 false
+     * Delete a directory (including all files within it)
+     * @return bool True on success, false on failure
      */
     public static function deleteDir(string $dir): bool
     {
@@ -66,7 +66,7 @@ class LocalFile
             return false;
         }
 
-        // 删除目录下所有文件（理论上只有一个）
+        // Delete all files in the directory (theoretically only one)
         foreach (scandir($dir) as $fileOrDir) {
             if ($fileOrDir == '.' || $fileOrDir == '..') {
                 continue;
@@ -80,7 +80,7 @@ class LocalFile
             }
         }
 
-        // 删除空目录
+        // Remove the empty directory
         rmdir($dir);
 
         return true;
@@ -96,7 +96,7 @@ class LocalFile
             $dataList = [$dataList];
         }
 
-        // 数据格式校验
+        // Validate data format
         self::validateCSVOrgData($dataList);
 
         return array_map(function ($item) {
@@ -105,20 +105,20 @@ class LocalFile
     }
 
     /**
-     * CSV 源数据格式校验
-     * 格式必须是形如：[['name' => '张三', 'age' => 18]]
+     * Validate CSV source data format.
+     * Format must be: [['name' => 'John', 'age' => 18]]
      */
     private static function validateCSVOrgData(array $data)
     {
         if (!is_array(reset($data))) {
-            throw new Exception("数据格式错误：必须是二维数组", ErrCode::DATA_FORMAT_ERR);
+            throw new Exception("Invalid data format: must be a two-dimensional array", ErrCode::DATA_FORMAT_ERR);
         }
 
-        // 第二维 的 value 必须是标量
+        // Values in the second dimension must be scalar
         $first = $data[0];
         foreach ($first as $val) {
             if (!is_null($val) && !is_scalar($val)) {
-                throw new Exception("数据格式错误：第二维数组的值必须是标量类型", ErrCode::DATA_FORMAT_ERR);
+                throw new Exception("Invalid data format: values in the second dimension must be scalar types", ErrCode::DATA_FORMAT_ERR);
             }
         }
     }
@@ -132,7 +132,7 @@ class LocalFile
 
         $file = fopen($fileName, $mode);
         if ($file === false) {
-            throw new FileException("打开文件失败:{$fileName}", ErrCode::FILE_OP_FAILED);
+            throw new FileException("Failed to open file: {$fileName}", ErrCode::FILE_OP_FAILED);
         }
 
         $this->file = $file;

@@ -5,7 +5,7 @@ namespace App\Domain\Transfer;
 use WecarSwoole\Entity;
 
 /**
- * 任务下载计数器
+ * Task download counter
  */
 class DownloadTimer extends Entity
 {

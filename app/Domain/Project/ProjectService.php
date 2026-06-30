@@ -15,17 +15,17 @@ class ProjectService
     }
 
     /**
-     * 创建项目组
+     * Create a new project group
      * @return Group
      */
     public function createGroup(string $groupName): Group
     {
         if (!$groupName) {
-            throw new Exception("项目组名称不能为空", ErrCode::EMPTY_PARAMS);
+            throw new Exception("Project group name cannot be empty", ErrCode::EMPTY_PARAMS);
         }
 
         if ($this->projectRepository->getGroupByName($groupName)) {
-            throw new Exception("该项目组已经存在", ErrCode::GROUP_AREADY_EXISTS);
+            throw new Exception("This project group already exists", ErrCode::GROUP_AREADY_EXISTS);
         }
 
         $group = new Group($groupName);
@@ -35,21 +35,21 @@ class ProjectService
     }
 
     /**
-     * 创建新项目
+     * Create a new project
      * @return Project
      */
     public function createProject(string $projectName, string $groupId): Project
     {
         if (!$projectName) {
-            throw new Exception("请提供项目名称", ErrCode::EMPTY_PARAMS);
+            throw new Exception("Please provide a project name", ErrCode::EMPTY_PARAMS);
         }
 
         if ($this->projectRepository->getProjectByName($projectName)) {
-            throw new Exception("该项目名称已经存在", ErrCode::PROJ_AREADY_EXISTS);
+            throw new Exception("This project name already exists", ErrCode::PROJ_AREADY_EXISTS);
         }
 
         if (!$group = $this->projectRepository->getGroupById($groupId)) {
-            throw new Exception("项目组不存在", ErrCode::GROUP_NOT_EXISTS);
+            throw new Exception("Project group does not exist", ErrCode::GROUP_NOT_EXISTS);
         }
 
         $project = new Project($projectName, $group);

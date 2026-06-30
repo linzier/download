@@ -3,15 +3,15 @@
 namespace App\Foundation\DTO;
 
 /**
- * 给仓储用
+ * Used by the repository layer
  */
 class DBTaskDTO extends TaskDTO
 {
-    public $ctime;// 创建时间
-    public $etime;// 最后执行时间
-    public $ftime;// 执行完成时间
-    public $stime;// 最后状态变更时间
-    public $qtime;// 最后入列时间
-    public $status;// 状态
-    public $retryNum;// 重试次数
+    public $ctime;// Creation time
+    public $etime;// Last execution time
+    public $ftime;// Execution completion time
+    public $stime;// Last status change time
+    public $qtime;// Last enqueue time
+    public $status;// Status
+    public $retryNum;// Retry count
 }

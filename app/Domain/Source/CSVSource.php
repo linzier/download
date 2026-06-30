@@ -12,8 +12,8 @@ use WecarSwoole\Util\File;
 use WecarSwoole\Util\GetterSetter;
 
 /**
- * CSV 数据源，将源数据存储为 CSV 格式
- * 支持多源，多个源数据之间通过 SPLIT_LINE 分割
+ * CSV data source: stores source data in CSV format.
+ * Supports multiple sources; source data sets are separated by SPLIT_LINE.
  */
 class CSVSource implements ISource
 {
@@ -27,35 +27,35 @@ class CSVSource implements ISource
     public const SPLIT_LINE = '-#-=@=-#-';
 
     /**
-     * @var array 数据源
+     * @var array Data sources
      */
     protected $srcs;
     protected $step;
     protected $interval;
-    // 单源还是多源模式
+    // Whether single-source or multi-source mode
     protected $sourceType;
 
-    // 生成的本地文件名
+    // Generated local file name
     private $fileName;
-    // 数据记录数（行数）
+    // Number of data records (rows)
     private $count;
-    // 源文件大小
+    // Source file size
     private $size;
     private $taskId;
 
     /**
-     * @param string|array $src 数据源。格式：
-     *        单表格模式：
-     *           单个 url 字符串，或者二维数组形式的源数据，如 "https://mp.domain.cn/...."、[["name"=>"张三"],...]
-     *        多表格模式（以两表格为例）：
-     *           多个 url 数组，如： ["https://mp.domain.cn/pathtos1", "https://mp.domain.cn/pathtos2"]
-     *           多个源数据数组，如：[[["name"=>"张三"],...], [["order_code"=>"1234"],...]]
-     *           url 和源数据混合，如：[[["name"=>"张三"],...], "https://mp.domain.cn/...."]
-     * @param string $dir 本地文件存储基路径
-     * @param string $taskId 关联的任务编号。此处存储 taskId 而不是 Task 主要避免循环依赖
-     * @param int $step 取数步长（每页取多少）
-     * @param int $interval 两次拉取之间时间间隔，单位毫秒
-     * @param int $sourceType 单源还是多源模式
+     * @param string|array $src Data source. Format:
+     *        Single table mode:
+     *           A single URL string, or a two-dimensional array of source data, e.g. "https://mp.domain.cn/...." or [["name"=>"John"],...]
+     *        Multi-table mode (taking two tables as an example):
+     *           Multiple URLs in an array, e.g. ["https://mp.domain.cn/pathtos1", "https://mp.domain.cn/pathtos2"]
+     *           Multiple source data arrays, e.g. [[["name"=>"John"],...], [["order_code"=>"1234"],...]]
+     *           Mixed URLs and source data, e.g. [[["name"=>"John"],...], "https://mp.domain.cn/...."]
+     * @param string $dir Base path for local file storage
+     * @param string $taskId Associated task ID. Stores taskId instead of Task primarily to avoid circular dependencies
+     * @param int $step Fetch step size (number of records per page)
+     * @param int $interval Time interval between two fetches, in milliseconds
+     * @param int $sourceType Single-source or multi-source mode
      * @throws \Exception
      */
     public function __construct(
@@ -79,7 +79,7 @@ class CSVSource implements ISource
     }
 
     /**
-     * 源文件名称（包含目录）
+     * Source file name (including directory)
      */
     public function fileName(): string
     {
@@ -87,7 +87,7 @@ class CSVSource implements ISource
     }
 
     /**
-     * 数据记录数（行数）
+     * Number of data records (rows)
      */
     public function count(): int
     {
@@ -105,7 +105,7 @@ class CSVSource implements ISource
     }
 
     /**
-     * 源文件大小，单位字节
+     * Source file size in bytes
      */
     public function size(): int
     {
@@ -120,10 +120,10 @@ class CSVSource implements ISource
         try {
             foreach ($this->srcs as $src) {
                 if (is_string($src)) {
-                    // url 拉取
+                    // Fetch from URL
                     $cnt += $this->fetchFromUrl($invoker, $src, $file, $targetType);
                 } else {
-                    // data 数据
+                    // Fetch from data
                     $cnt += $this->fetchFromData($src, $file, $targetType);
                 }
             }
@@ -138,12 +138,12 @@ class CSVSource implements ISource
     }
 
     /**
-     *  从 url 循环拉取并写入到本地文件
+     *  Fetch data from URL in a loop and write to a local file
      * @param API $invoker
      * @param string $src
      * @param LocalFile $file
      * @param string $targetType
-     * @return int 记录数
+     * @return int Number of records
      * @throws SourceException
      * @throws \App\Exceptions\FileException
      */
@@ -151,7 +151,7 @@ class CSVSource implements ISource
     {
         $page = $n = $total = $cnt = 0;
         $fieldNum = 0;
-        $gotNoEmptyData = false;// 是否已经获取到了非空数据（有可能前几次拿到的数据都是空，此时我们无法拿到 field 信息）
+        $gotNoEmptyData = false;// Whether non-empty data has been fetched (early fetches may return empty data, in which case field information is unavailable)
 
         $invoker->setUrl($src);
 
@@ -163,28 +163,28 @@ class CSVSource implements ISource
             }
 
             $data = $result['data'];
-            // 如果传了force_continue，则除非客户端将该参数设置为 0，否则会继续请求
-            // 应对客户端从数据库取出数据后又做了过滤的情况，这种情况下有可能获取到的数据条数小于 page_size，但实际上后面还有数据
+            // If force_continue is provided, the request continues unless the client sets this parameter to 0
+            // This handles the case where the client filters data after fetching from the database, resulting in fewer records than page_size even though more data is available
             $forceContinue = $result['force_continue'] ?? null;
 
             if (!$forceContinue && !$data) {
                 break;
             }
 
-            // 保存到文件
+            // Save to file
             list($c, $fieldNum) = $this->innerSaveToFile($file, $data, $targetType, !$gotNoEmptyData && count($data));
             $cnt += $c;
 
             if ($n == 1) {
-                $total = $result['total'] ?? PHP_INT_MAX;// 如果没有提供 total，则会不停地循环拉数据直到拉完
+                $total = $result['total'] ?? PHP_INT_MAX;// If total is not provided, keep fetching data in a loop until exhausted
             }
 
-            // 如果接口方明确提供了 force_continue，则先判断该值
+            // If the API explicitly provides force_continue, check that value first
             if ($forceContinue === 0) {
                 break;
             }
 
-            // 为了健壮性，此处做了两方面的检测，防止对方接口有 bug 导致一直拉取数据
+            // Two safeguards are applied here for robustness, to prevent infinite data fetching if the remote API has a bug
             if ($forceContinue === null && count($data) < $this->step || $cnt >= $total) {
                 break;
             }
@@ -200,9 +200,9 @@ class CSVSource implements ISource
             }
         }
 
-        // 文件末尾增加分隔符
+        // Append separator at the end of the file
         if ($targetType == Target::TYPE_EXCEL && $fieldNum > 0) {
-            // 源数据之间增加分隔符
+            // Add separator between source data sets
             $file->saveAsCsv(array_pad([], $fieldNum, self::SPLIT_LINE));
         }
 
@@ -224,9 +224,9 @@ class CSVSource implements ISource
 
         list($cnt, $fieldNum) = $this->innerSaveToFile($file, $data, $targetType, true);
 
-        // 文件末尾增加分隔符
+        // Append separator at the end of the file
         if ($targetType == Target::TYPE_EXCEL && $fieldNum > 0) {
-            // 源数据之间增加分隔符
+            // Add separator between source data sets
             $file->saveAsCsv(array_pad([], $fieldNum, self::SPLIT_LINE));
         }
 
@@ -238,20 +238,20 @@ class CSVSource implements ISource
      * @param array $data
      * @param string $targetType
      * @param bool $saveFields
-     * @return array 格式 [记录数, 列数]
+     * @return array Format [record count, column count]
      * @throws \App\Exceptions\FileException
      */
     private function innerSaveToFile(LocalFile $file, array $data, string $targetType, bool $saveFields): array
     {
-        // 格式化成统一的二维数组形式
+        // Format into a uniform two-dimensional array
         $data = $this->formatSourceData($data);
 
         if (!$data) {
             return [0, 0];
         }
 
-        // 将 key 写入，同时写入每列的类型（目前仅支持 number、string 两种类型）
-        // 存入格式：field|type，如 age|number,uname|string
+        // Write field keys and column types (currently only supports number and string types)
+        // Storage format: field|type, e.g. age|number,uname|string
         if ($saveFields) {
             $fields = [];
             foreach ($data[0] as $field => $value) {
@@ -264,29 +264,29 @@ class CSVSource implements ISource
             $file->saveAsCsv($fields);
         }
 
-        // 存储数据
+        // Store data
         $file->saveAsCsv($data);
 
         return [count($data), count(reset($data))];
     }
 
     /**
-     * 格式化源数据数组格式，统一整理成如下数组，并将 excel 行表头纳入其中
-     * @param array $data 原始数据数组
-     *      原始数组有以下几种格式（最多四维）：
-     *          二维数组：
+     * Format source data arrays into a unified two-dimensional array, incorporating the Excel row header
+     * @param array $data Raw data array
+     *      Supported formats (up to four dimensions):
+     *          Two-dimensional array:
      *              [
-     *                  ['name'=>'张三', 'age'=> 18],
+     *                  ['name'=>'John', 'age'=> 18],
      *              ]
-     *          三维数组（行列表头格式）：
+     *          Three-dimensional array (row header format):
      *              [
      *                  'row_head_one' => [
-     *                      ['name'=>'张三', 'age'=> 18],
+     *                      ['name'=>'John', 'age'=> 18],
      *                  ]
      *              ]
-     * @return array 格式化后的数组：
+     * @return array Formatted array:
      * [
-     *      ["name" => "张三", "age" => 18]
+     *      ["name" => "John", "age" => 18]
      * ]
      */
     private function formatSourceData(array $data): array
@@ -298,19 +298,19 @@ class CSVSource implements ISource
         $firstEle = reset($data);
 
         /**
-         * 二维数组
+         * Two-dimensional array
          */
         if (!$firstEle || !is_array($firstEle)) {
             return [];
         }
 
-        // 判断第二维数组的第一个元素
+        // Check the first element of the second dimension
         if (!is_array(reset($firstEle))) {
             return $data;
         }
 
         /**
-         * 单源三维数组
+         * Single-source three-dimensional array
          */
         $newData = [];
         foreach ($data as $rowHead => $item) {
@@ -329,14 +329,14 @@ class CSVSource implements ISource
          
         if (!$result || !isset($result['status']) || $result['status'] !== 200) {
             throw new SourceException(
-                "获取源数据失败：返回：" . print_r($result, true),
+                "Failed to fetch source data. Response: " . print_r($result, true),
                 ErrCode::FETCH_SOURCE_FAILED
             );
         }
 
         if (!isset($result['data']['data'])) {
             throw new SourceException(
-                "获取源数据失败：数据格式错误：" . print_r($result, true),
+                "Failed to fetch source data. Invalid data format: " . print_r($result, true),
                 ErrCode::FETCH_SOURCE_FAILED
             );
         }
@@ -359,7 +359,7 @@ class CSVSource implements ISource
     }
 
     /**
-     * 该 format 需要支持未格式化的和已经格式化的 src
+     * This format method supports both unformatted and pre-formatted source data
      * @param $src
      * @return array
      * @throws \Exception
@@ -367,35 +367,35 @@ class CSVSource implements ISource
     private function formatSrc($src): array
     {
         if ($this->sourceType == self::SOURCE_TYPE_SIMPLE) {
-            // 单源模式
-            // 单个 url 字符串: "https://..."
+            // Single-source mode
+            // Single URL string: "https://..."
             if (self::isUrlSource($src)) {
                 return [$src];
             }
 
-            // data 的 json string: "[{"k":"v"}]"
+            // JSON string of data: "[{"k":"v"}]"
             if (is_string($src)) {
                 return [json_decode($src, true)];
             }
 
-            // 已经格式化好了的 url 数组: ["https://...",]
+            // Pre-formatted URL array: ["https://...",]
             if (self::isUrlSource(reset($src))) {
                 return $src;
             }
 
-            // 已经格式化好了的 data 数组: [[[k=>v],],]
+            // Pre-formatted data array: [[[k=>v],],]
             $firstEle = reset($src);
             if (is_array(reset($firstEle))) {
                 return $src;
             }
 
-            // 未格式化的 data 数组: [[k=>v],]
+            // Unformatted data array: [[k=>v],]
             return [$src];
         }
 
-        // 多源模式
+        // Multi-source mode
         if (!is_array($src)) {
-            throw new \Exception("多表格模式下 source 必须是列表格式", ErrCode::SOURCE_FORMAT_ERR);
+            throw new \Exception("In multi-table mode, source must be in list format", ErrCode::SOURCE_FORMAT_ERR);
         }
 
         foreach ($src as $i => $v) {

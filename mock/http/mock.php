@@ -8,12 +8,12 @@ $mock = new Mock();
 
 return [
     /**
-     * 支持返回完整格式(完整格式必须至少同时有 http_code 和 body)：
+     * Supports returning full format (full format must have at least both http_code and body):
      *      [
      *          'http_code' => 200, // http code
-     *          'body' => ... // http body，数组或者字符串，或者其他实现了 __toString() 的对象
-     *          'headers' => [], // http 响应头
-     *          'activate' => 1, // 激活，0表示不再使用该 mock 数据，将请求真实数据
+     *          'body' => ... // http body, array, string, or any object implementing __toString()
+     *          'headers' => [], // http response headers
+     *          'activate' => 1, // active flag, 0 means this mock data is disabled and real requests will be made
      *      ]
      */
     'weicar:user.info' => [
@@ -21,9 +21,9 @@ return [
         'name' => $mock->cnName()
     ],
     /**
-     * 返回闭包
-     * 闭包中可以做复杂的处理，比如模拟慢请求，返回 http 错误码等
-     * 返回格式同上面
+     * Returns a closure.
+     * The closure can perform complex operations such as simulating slow requests or returning HTTP error codes.
+     * Return format is the same as above.
      */
     'weicar:coupon.info' => function (HttpConfig $config, RequestInterface $request) use ($mock) {
         return [

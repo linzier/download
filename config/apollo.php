@@ -1,7 +1,7 @@
 <?php
 
 /**
- *  Client 配置中心
+ * Apollo Configuration Center
  */
 return [
     'app_id' => 1008633,
@@ -11,7 +11,7 @@ return [
         'preview' => 'http://preview.configserver.zhihuiyouzhan.cn:8080',
         'produce' => 'http://production.configserver.zhihuiyouzhan.cn:8080',
     ],
-    // 需要监听的 namespace
+    // Namespaces to watch
     'namespaces' => [
         'application',
         'fw.appids',

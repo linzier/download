@@ -6,17 +6,17 @@ use App\ErrCode;
 use WecarSwoole\Exceptions\Exception;
 
 /**
- * 列标头
+ * Column header
  */
 class ColHead extends Node
 {
     use NodeParser;
 
-    public const DT_STR = 'string';// 默认类型
+    public const DT_STR = 'string';// Default type
     public const DT_NUM = 'number';
-    public const DT_RICH = 'rich';// 富文本
+    public const DT_RICH = 'rich';// Rich text
 
-    // 列数据类型
+    // Column data type
     protected $dataType;
 
     public function __construct(string $name = '', string $title = '', Style $style = null, string $dataType = self::DT_STR)
@@ -50,7 +50,7 @@ class ColHead extends Node
         $dataType = strtolower($dataType);
 
         if (!in_array($dataType, [self::DT_STR, self::DT_NUM, self::DT_RICH])) {
-            throw new Exception("模板错误：数据格式不合法：{$dataType}", ErrCode::PARAM_VALIDATE_FAIL);
+            throw new Exception("Template error: invalid data format: {$dataType}", ErrCode::PARAM_VALIDATE_FAIL);
         }
 
         $this->dataType = $dataType;

@@ -68,7 +68,7 @@ class Task extends Controller
     }
 
     /**
-     * 投递任务
+     * Submit task
      */
     public function deliver()
     {
@@ -78,7 +78,7 @@ class Task extends Controller
     }
 
     /**
-     * 投递任务：多表格模式
+     * Submit task: multi-table mode
      */
     public function deliverMultiple()
     {
@@ -89,12 +89,12 @@ class Task extends Controller
     }
 
     /**
-     * 查询某个任务详情
+     * Query task details
      */
     public function one()
     {
         if (!$taskDTO = Container::get(ITaskRepository::class)->getTaskDTOById($this->params('task_id'))) {
-            return $this->return([], ErrCode::TASK_NOT_EXISTS, '任务不存在');
+            return $this->return([], ErrCode::TASK_NOT_EXISTS, 'Task does not exist');
         }
 
         $taskArr = $taskDTO->toArray(true, true, false, ['sourceUrl', 'sourceData', 'source', 'fileName', 'callback', 'template', 'title', 'summary', 'header', 'footer']);
@@ -102,7 +102,7 @@ class Task extends Controller
     }
 
     /**
-     * 查询任务列表
+     * Query task list
      */
     public function list()
     {
@@ -129,7 +129,7 @@ class Task extends Controller
     }
 
     /**
-     * 删除任务
+     * Delete task
      */
     public function delete()
     {
@@ -142,7 +142,7 @@ class Task extends Controller
     }
 
     /**
-     * 处理状态：外部只支持传入 3,4,6
+     * Process status: externally only supports passing 3, 4, 6
      */
     private function formateStatus(array $status): array
     {
@@ -163,7 +163,7 @@ class Task extends Controller
             $task['status'] = DlTask::STATUS_EXPIRED;
         }
 
-        // 状态处理
+        // Status mapping
         $task['status'] = [
             DlTask::STATUS_TODO => DlTask::STATUS_DOING,
             DlTask::STATUS_ENQUEUED => DlTask::STATUS_DOING,
@@ -174,10 +174,10 @@ class Task extends Controller
             DlTask::STATUS_EXPIRED => DlTask::STATUS_EXPIRED,
         ][$task['status']];
         $task['status_name'] = [
-            DlTask::STATUS_DOING => '处理中',
-            DlTask::STATUS_SUC => '处理成功',
-            DlTask::STATUS_ERR => '处理失败',
-            DlTask::STATUS_EXPIRED => '已过期',
+            DlTask::STATUS_DOING => 'Processing',
+            DlTask::STATUS_SUC => 'Completed',
+            DlTask::STATUS_ERR => 'Failed',
+            DlTask::STATUS_EXPIRED => 'Expired',
         ][$task['status']];
 
         return $task;

@@ -6,13 +6,13 @@ use App\ErrCode;
 use WecarSwoole\Exceptions\Exception;
 
 /**
- * 根据配置文件解析出 excel 节点树
+ * Parse configuration into an Excel node tree
  */
 trait NodeParser
 {
     public static function parse(array $config): Node
     {
-        // 加入顶层节点
+        // Add top-level node
         if (!isset($config['name']) || $config['name'] !== Node::NODE_TOP) {
             $conf = [
                 'name' => Node::NODE_TOP,
@@ -24,7 +24,7 @@ trait NodeParser
 
         $node = self::parseNode($conf);
 
-        // 计算每个节点在 Excel 中的位置
+        // Calculate each node's position in Excel
         self::calcPosition($node);
 
         return $node;
@@ -36,22 +36,23 @@ trait NodeParser
     }
 
     /**
-     * 注意：为了方便理解，此处统一认为位置数组中的第一维是行号，第二维是列号（实际中对于 RowHead 来说需要反转过来理解）
-     * 第一个子节点列号和父节点的相同
-     * 后续子节点相对于父节点的列偏移量是前面所有子节点的广度之和
-     * @param Node $node 要计算的节点
-     * @param int $parentRowNum 父节点行号
-     * @param int $parentColNum 父节点列号
-     * @param array $neighbours 本节点的前置邻居节点列表（邻居是指同一个父节点下的节点）
+     * Note: for clarity, the first dimension of the position array is treated as row number and the second as column number
+     * (in practice, RowHead needs to interpret this reversed).
+     * The first child node shares the same column number as the parent.
+     * Subsequent child nodes have a column offset relative to the parent equal to the sum of all preceding siblings' breadth.
+     * @param Node $node The node to calculate
+     * @param int $parentRowNum Parent node row number
+     * @param int $parentColNum Parent node column number
+     * @param array $neighbours List of preceding sibling nodes (siblings share the same parent)
      */
     protected static function calcPos(Node $node, int $parentRowNum, int $parentColNum, array $neighbours)
     {
         $row = $parentRowNum + 1;
         if (!$neighbours) {
-            // 没有前置邻居（第一个节点），则取父节点的列号
+            // No preceding siblings (first node); use the parent's column number
             $col = $parentColNum;
         } else {
-            // 否则，取父节点列号 + 所有邻居广度之和（相对于父节点的列偏移）
+            // Otherwise, use parent's column number + sum of all siblings' breadth (column offset relative to parent)
             $offset = 0;
             foreach ($neighbours as $neighbour) {
                 $offset += $neighbour->breadth();
@@ -87,7 +88,7 @@ trait NodeParser
     protected static function validate(array $colCfg)
     {
         if (!isset($colCfg['name']) && !isset($colCfg['title'])) {
-            throw new Exception("模板格式错误：name 和 title 至少提供一个", ErrCode::PARAM_VALIDATE_FAIL);
+            throw new Exception("Template format error: at least one of 'name' or 'title' must be provided", ErrCode::PARAM_VALIDATE_FAIL);
         }
     }
 

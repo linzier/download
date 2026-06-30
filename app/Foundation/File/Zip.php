@@ -7,7 +7,7 @@ use WecarSwoole\Exceptions\Exception;
 use ZipArchive;
 
 /**
- * zip 格式归档压缩
+ * ZIP archive compression
  */
 class Zip implements ICompress
 {
@@ -18,7 +18,7 @@ class Zip implements ICompress
         $archiveFileName .= strpos($archiveFileName, '.') === false ? '.zip' : ''; 
 
         if (!file_exists($archiveFileName)) {
-            // 先创建文件，否则有些操作系统报错
+            // Create the file first, otherwise some operating systems will throw an error
             touch($archiveFileName);
             chmod($archiveFileName, 0755);
         }
@@ -39,7 +39,7 @@ class Zip implements ICompress
 
         $zip->close();
 
-        // 必须在 zip close 后才能删除文件
+        // Files can only be deleted after zip is closed
         if ($delOrigFile) {
             foreach ($origFileNames as $fileName) {
                 unlink($fileName);

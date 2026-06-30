@@ -8,7 +8,7 @@ use WecarSwoole\Container;
 use Psr\Log\LoggerInterface;
 
 /**
- * 待处理处理程序
+ * Pending (to-do) handler
  */
 class ToDoHandler extends WorkHandler
 {
@@ -18,12 +18,12 @@ class ToDoHandler extends WorkHandler
     }
 
     /**
-     * 拉取源数据
+     * Fetch source data
      */
     protected function exec()
     {
         try {
-            // 获取数据
+            // Fetch data
             Container::get(SourceService::class)->fetch($this->task()->source(), $this->task()->target());
             $this->notify(WorkFlow::WF_SOURCE_READY);
         } catch (\Throwable $e) {

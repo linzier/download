@@ -10,15 +10,15 @@ use WecarSwoole\Exceptions\Exception;
 class Upload
 {
     /**
-     * 上传文件到远程存储
-     * 使用阿里云的 OSS 存储
-     * @param string $localFile 本地文件名称（绝对名称）
-     * @param string $taskId 任务编号，内部根据此参数生成远程文件名称
+     * Upload file to remote storage
+     * Uses Alibaba Cloud OSS storage
+     * @param string $localFile Local file name (absolute path)
+     * @param string $taskId Task ID; used internally to generate the remote file name
      */
     public function upload(string $localFile, string $taskId, string $downloadName)
     {
         if (!is_readable($localFile)) {
-            throw new Exception("本地目标文件不存在", ErrCode::FILE_OP_FAILED);
+            throw new Exception("Local target file does not exist", ErrCode::FILE_OP_FAILED);
         }
 
         $config = Config::getInstance();

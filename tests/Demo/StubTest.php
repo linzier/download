@@ -8,7 +8,7 @@ use Test\Demo\Sample\SomeClass;
 use Test\Demo\Sample\FileNotFoundException;
 
 /**
- * 桩件。一般用桩件（Stub）来模拟外部依赖（如数据库对象）
+ * Stubs. Stubs are typically used to mock external dependencies (e.g., database objects).
  * Class StubTest
  * @package Test\Demo
  */
@@ -62,7 +62,7 @@ class StubTest extends TestCase
     {
         $this->expectException(FileNotFoundException::class);
 
-        $this->stub->method('run')->will($this->throwException(new FileNotFoundException("未找到文件")));
+        $this->stub->method('run')->will($this->throwException(new FileNotFoundException("File not found")));
         $this->stub->run();
     }
 }

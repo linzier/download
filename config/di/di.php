@@ -16,27 +16,27 @@ use WecarSwoole\Logger;
 use function DI\{autowire, get};
 
 return [
-    // 仓储
+    // Repositories
     ITransferRepository::class => autowire(RedisTransferRepository::class),
     'App\Domain\*\I*Repository' => autowire('\App\Foundation\Repository\*\MySQL*Repository'),
-    // 缓存
+    // Cache
     CacheInterface::class => function () {
         return CacheFactory::build();
     },
-    // 日志
+    // Logger
     LoggerInterface::class => function () {
         return Logger::getInstance();
     },
-    // 事件
+    // Event dispatcher
     EventDispatcherInterface::class => function () {
         return new EventDispatcher();
     },
     'SymfonyEventDispatcher' =>  get(EventDispatcherInterface::class),
-    // DI 容器
+    // DI Container
     ContainerInterface::class => function () {
         return Di::getInstance()->get('di-container');
     },
-    // ID 生成器
+    // ID Generator
     IIDGenerator::class => function () {
         return new UUIDGenerator();
     }

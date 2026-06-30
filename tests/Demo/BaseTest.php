@@ -5,7 +5,7 @@ namespace Test\Demo;
 use PHPUnit\Framework\TestCase;
 
 /**
- * 基本用法
+ * Basic Usage
  * Class BaseTest
  * @package Test
  */
@@ -22,6 +22,6 @@ class BaseTest extends TestCase
 
 //    public function testSomething()
 //    {
-//        $this->markTestIncomplete("此测试尚未实现");
+//        $this->markTestIncomplete("This test has not been implemented yet");
 //    }
 }

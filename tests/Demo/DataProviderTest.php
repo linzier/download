@@ -5,14 +5,14 @@ namespace Test\Demo;
 use PHPUnit\Framework\TestCase;
 
 /**
- * 数据提供器
+ * Data Provider
  * Class DataProviderTest
  * @package Test\Demo
  */
 class DataProviderTest extends TestCase
 {
     /**
-     * 测试数据供给
+     * Test data supply
      * @param $a
      * @param $b
      * @param $expected
@@ -24,9 +24,9 @@ class DataProviderTest extends TestCase
     }
 
     /**
-     * 数据供给器必须返回二维数组，或者迭代器，其元素为数组
-     * 可以使用字符串下标将其语义化
-     * 第二维的每个元素对应接收方的形参
+     * The data provider must return a two-dimensional array or an iterator whose elements are arrays.
+     * String keys can be used to make it more semantic.
+     * Each element in the second dimension corresponds to a parameter of the receiving method.
      * @return array
      */
     public function dataProvider()

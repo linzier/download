@@ -46,7 +46,7 @@ class RedisTransferRepository extends Repository implements ITransferRepository
     }
 
     /**
-     * 保存任务下载次数
+     * Save task download count
      */
     public function saveDownloadTimer(DownloadTimer $timer)
     {
@@ -60,7 +60,7 @@ class RedisTransferRepository extends Repository implements ITransferRepository
     }
 
     /**
-     * 查询任务下载次数
+     * Retrieve task download count
      */
     public function getDownloadTimer(string $taskId): ?DownloadTimer
     {

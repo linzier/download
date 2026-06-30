@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
 use WecarSwoole\Container;
 
 /**
- * 队列监听
+ * Queue Listener
  */
 class QueueListener
 {
@@ -20,26 +20,26 @@ class QueueListener
     public static function listen()
     {
         /**
-         * task 队列监听
+         * Task queue listener
          */
         self::consumer()->listen(function (Job $job) {
-            // data 格式：['task_id' => '13112sdas', 'enqueue_time' => 23234223423]
+            // Data format: ['task_id' => '13112sdas', 'enqueue_time' => 23234223423]
             $data = $job->getJobData();
             if (!$data || !isset($data['task_id'])) {
                 return;
             }
 
             if (!$task = Container::get(ITaskRepository::class)->getTaskById($data['task_id'])) {
-                Container::get(LoggerInterface::class)->error("处理任务失败：任务不存在：{$data['task_id']}");
+                Container::get(LoggerInterface::class)->error("Failed to process task: task not found: {$data['task_id']}");
                 return;
             }
-            // 交给任务管理器处理
+            // Delegate to task manager for processing
             TaskManager::getInstance()->process($task);
         }, 1);
     }
 
     /**
-     * 停止 task 队列监听
+     * Stop task queue listener
      */
     public static function stop()
     {

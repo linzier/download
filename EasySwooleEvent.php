@@ -23,7 +23,7 @@ class EasySwooleEvent implements Event
     {
         date_default_timezone_set('Asia/Shanghai');
 
-        // HTTP 控制器命名空间
+        // HTTP controller namespace
         Di::getInstance()->set(SysConst::HTTP_CONTROLLER_NAMESPACE, 'App\\Http\\Controllers\\');
     }
 
@@ -35,12 +35,12 @@ class EasySwooleEvent implements Event
     {
         $server = ServerManager::getInstance()->getSwooleServer();
 
-        // 设置 web socket 处理程序
+        // Set up WebSocket message handler
         $server->on("message", function ($server, $frame) {
             DownloadNotice::watch($frame->fd, $frame->data);
         });
 
-        // 热重启(仅用在非生产环境)
+        // Hot reload (non-production environments only)
         if (Core::getInstance()->isDev()) {
             $server->addProcess(
                 (new HotReload(
@@ -57,25 +57,25 @@ class EasySwooleEvent implements Event
             );
         }
 
-        // worker 进程启动脚本
+        // Worker process startup script
         $register->add(EventRegister::onWorkerStart, function ($server) {
             ini_set("memory_limit", "4096M");
             Bootstrap::boot();
 
-            // 启动队列监听（仅在 worker 进程启动）
+            // Start queue listener (worker process only)
             if (!$server->taskworker) {
                 QueueListener::listen();
             }
         });
 
-        // 服务器关闭时试图清理 master flag 文件
+        // Attempt to clean up master flag file on server shutdown
         $register->add(EventRegister::onShutdown, function ($server) {
             Defender::removeMasterFlag();
         });
 
-        // Apollo 配置变更监听程序
+        // Apollo configuration change watcher
         $server->addProcess((new ApolloWatcher())->getProcess());
-        // 任务守卫程序
+        // Task defender process
         $server->addProcess((new Defender())->getProcess());
 
         CronTabUtil::register();
@@ -89,7 +89,7 @@ class EasySwooleEvent implements Event
      */
     public static function onRequest(Request $request, Response $response): bool
     {
-        // 设置 request id
+        // Set request ID
         ContextManager::getInstance()->set('wcc-request-id', new RequestId($request));
 
         return true;

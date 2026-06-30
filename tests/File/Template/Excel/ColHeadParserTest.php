@@ -16,7 +16,7 @@ class ColHeadParserTest extends TestCase
     {
         $cfgStr = '[{
             "name": "money",
-            "title": "标题1",
+            "title": "Title 1",
             "type": "auto",
             "width": 50,
             "height": 40,
@@ -27,7 +27,7 @@ class ColHeadParserTest extends TestCase
             "children": [
                 {
                     "name": "money",
-                    "title": "标题21",
+                    "title": "Title 21",
                     "type": "auto",
                     "width": 60,
                     "height": 50,
@@ -37,7 +37,7 @@ class ColHeadParserTest extends TestCase
                     "bg_color": "white",
                     "children": [{
                         "name": "money",
-                        "title": "标题3",
+                        "title": "Title 3",
                         "type": "auto",
                         "width": 70,
                         "height": 60,
@@ -49,7 +49,7 @@ class ColHeadParserTest extends TestCase
                 },
                 {
                     "name": "money",
-                    "title": "标题22",
+                    "title": "Title 22",
                     "type": "auto",
                     "width": 60,
                     "height": 50,
@@ -59,7 +59,7 @@ class ColHeadParserTest extends TestCase
                     "bg_color": "white",
                     "children": [{
                         "name": "money",
-                        "title": "标题3",
+                        "title": "Title 3",
                         "type": "auto",
                         "width": 70,
                         "height": 60,
@@ -76,9 +76,9 @@ class ColHeadParserTest extends TestCase
          * @var ColHead
          */
         $col = ColHeadParser::getInstance()->parse($cfg);
-        $this->assertEquals($col->title(), '标题1');
+        $this->assertEquals($col->title(), 'Title 1');
         $this->assertEquals(count($col->children()), 2);
-        $this->assertEquals($col->children()[0]->title(), '标题21');
-        $this->assertEquals($col->children()[0]->children()[0]->title(), '标题3');
+        $this->assertEquals($col->children()[0]->title(), 'Title 21');
+        $this->assertEquals($col->children()[0]->children()[0]->title(), 'Title 3');
     }
 }
