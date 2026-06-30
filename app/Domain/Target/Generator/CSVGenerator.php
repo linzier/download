@@ -12,12 +12,12 @@ use EasySwoole\EasySwoole\Config;
 use WecarSwoole\Util\File;
 
 /**
- * CSV 文件生成器
+ * CSV file generator
  */
 class CSVGenerator
 {
     /**
-     * CSV 目标文件生成方式
+     * Generate CSV target file
      */
     public function generate(ISource $source, CSVTarget $target, ICompress $compress = null)
     {
@@ -27,17 +27,17 @@ class CSVGenerator
 
         $sourceFileName = $source->fileName();
         if (!$sourceFileName || !file_exists($sourceFileName)) {
-            throw new FileException("CSV 目标文件生成失败：源文件不存在。source：{$sourceFileName}", ErrCode::FILE_OP_FAILED);
+            throw new FileException("Failed to generate CSV target file: source file does not exist. source: {$sourceFileName}", ErrCode::FILE_OP_FAILED);
         }
 
         if (rename($sourceFileName, $target->targetFileName()) === false) {
             throw new FileException("generate target file fail.rename failed.", ErrCode::FILE_OP_FAILED);
         }
 
-        // 压缩
+        // Compress
         if ($compress && $source->size() > Config::getInstance()->getConf("zip_threshold")) {
             $newTargetFileName = $compress->compress(File::join($target->getBaseDir(), 'target'), [$target->targetFileName()]);
-            // 重新设置目标文件名字
+            // Reset target file name
             $target->setTargetFileName($newTargetFileName);
         }
     }

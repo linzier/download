@@ -7,9 +7,10 @@ use WecarSwoole\Exceptions\Exception;
 use WecarSwoole\Util\File;
 
 /**
- * 目标文件
- * 目标文件由 meta（元数据） + data（数据） 构成，meta 决定目标文件的内容如何展现，data 则是要展现什么
- * 不同的目标文件的 meta 信息大不相同，因而此处使用数组存储，具体的目标文件自身定义数组格式，外界根据其约定格式传递参数
+ * Target file
+ * A target file consists of meta (metadata) + data. Meta determines how the content is presented, while data determines what is presented.
+ * Different target files have very different meta information, so we use an array to store it.
+ * Each target file defines its own array format, and callers pass parameters according to the agreed format.
  */
 class Target
 {
@@ -21,20 +22,20 @@ class Target
         self::TYPE_EXCEL => ['xlsx', 'xls'],
     ];
 
-    // 目标文件名称（给程序用的）
+    // Target file name (used by the system)
     protected $targetFileName;
-    // 下载文件名称（给用户看的）
+    // Download file name (shown to the user)
     protected $downloadFileName;
-    // 目标文件类型
+    // Target file type
     protected $type;
-    // 元数据
+    // Metadata
     protected $metaData = [];
     protected $baseDir;
 
     /**
-     * @param string $baseDir 目标临时文件存放目录
-     * @param string $downloadFileName 下载文件名称
-     * @param string $type 文件类型
+     * @param string $baseDir Directory for temporary target files
+     * @param string $downloadFileName Download file name
+     * @param string $type File type
      */
     public function __construct(string $baseDir, string $downloadFileName = '', string $type = 'csv')
     {
@@ -45,7 +46,7 @@ class Target
     }
 
     /**
-     * 下载文件名称（给用户看的）
+     * Download file name (shown to the user)
      */
     public function downloadFileName(): string
     {
@@ -53,7 +54,7 @@ class Target
     }
 
     /**
-     * 目标文件名称（给系统用的）
+     * Target file name (used by the system)
      */
     public function targetFileName(): string
     {
@@ -61,7 +62,7 @@ class Target
     }
 
     /**
-     * 设置目标文件名称
+     * Set target file name
      */
     public function setTargetFileName(string $fileName = '')
     {
@@ -74,7 +75,7 @@ class Target
     }
 
     /**
-     * 设置目标文件的元数据
+     * Set target file metadata
      */
     public function setMeta(array $metaData)
     {
@@ -82,7 +83,7 @@ class Target
     }
 
     /**
-     * 目标文件基路径
+     * Target file base path
      */
     public function getBaseDir(): string
     {
@@ -90,7 +91,7 @@ class Target
     }
 
     /**
-     * 获取 meta 信息
+     * Get meta information
      * @return mixed
      */
     public function getMeta(string $key = '')
@@ -101,7 +102,7 @@ class Target
     private function setType(string $type)
     {
         if (!in_array($type, [self::TYPE_CSV, self::TYPE_EXCEL])) {
-            throw new Exception("目标文件类型不合法", ErrCode::PARAM_VALIDATE_FAIL);
+            throw new Exception("Invalid target file type", ErrCode::PARAM_VALIDATE_FAIL);
         }
 
         $this->type = $type;
@@ -137,7 +138,7 @@ class Target
     }
 
     /**
-     * 对传入的文件名称做处理，去掉前后的 .，将 / 替换成 _
+     * Sanitize the given file name: trim leading/trailing dots, replace slashes with underscores
      */
     private static function fixDownloadFileName(string $name): string
     {

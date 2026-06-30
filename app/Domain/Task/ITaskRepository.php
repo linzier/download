@@ -11,57 +11,57 @@ interface ITaskRepository
     public function getTaskById(string $id): ?Task;
 
     /**
-     * 根据任务 id 获取任务详情 DTO
+     * Get task detail DTO by task ID
      */
     public function getTaskDTOById(string $id): ?DBTaskDTO;
 
     /**
-     * 根据项目 id 获取该项目下的任务列表，按照任务创建时间倒序排列
-     * @param array $projectIds 项目 id 列表（可以一次查多个项目的）
-     * @param array $status 任务状态列表，空数组表示全部状态
-     * @param int $page 分页，从 0 开始
-     * @param int $pageSize 每页数
-     * @param mixed $operatorId 操作员
-     * @param Merchant $merchant 商户
-     * @param string $taskName 任务名称
-     * @return Array DBTaskDTO 数组
+     * Get the task list under the given project IDs, ordered by task creation time descending
+     * @param array $projectIds Project ID list (can query multiple projects at once)
+     * @param array $status Task status list; empty array means all statuses
+     * @param int $page Pagination, starting from 0
+     * @param int $pageSize Number of items per page
+     * @param mixed $operatorId Operator
+     * @param Merchant $merchant Merchant
+     * @param string $taskName Task name
+     * @return Array Array of DBTaskDTO
      */
     public function getTaskDTOs(array $projectIds, int $page, int $pageSize = 20, array $status = [], $operatorId = '', Merchant $merchant = null, $taskName = ''): Array;
 
     /**
-     * 查询可能需要重试的任务列表
-     * @param array $status 状态列表
-     * @param int $startTime 任务创建时间起始
-     * @param int $endTime 任务创建时间结束
-     * @param int $maxRetry 最大重试次数限制
-     * @return array DBTaskDTO 对象数组
+     * Query the list of tasks that may need retrying
+     * @param array $status Status list
+     * @param int $startTime Task creation time start
+     * @param int $endTime Task creation time end
+     * @param int $maxRetry Maximum retry limit
+     * @return array Array of DBTaskDTO objects
      */
     public function getTaskDTOsToRetry(array $status, int $startTime, int $endTime, int $maxRetry): Array;
 
     /**
-     * 修改任务状态
-     * @return bool 是否修改成功
+     * Change task status
+     * @return bool Whether the change was successful
      */
     public function changeTaskStatus(Task $task, int $oldStatus): bool;
 
     /**
-     * 归档 $beforeTime 之前的数据
-     * @param int $beforeTime 归档此时间之前的数据（unix timestamp）
-     * @param bool $optimize 是否执行 optimize table 整理表碎片
+     * Archive data before $beforeTime
+     * @param int $beforeTime Archive data before this time (unix timestamp)
+     * @param bool $optimize Whether to run OPTIMIZE TABLE to defragment
      */
     public function fileTask(int $beforeTime, bool $optimize);
 
     /**
-     * 查询任务状态
+     * Query task status
      */
     public function getTaskStatus(string $taskId): int;
 
     /**
-     * 删除任务
-     * 可以一次删除多个
-     * @param array $taskIds 需要删除的任务列表
-     * @param array $projectIds 限制只能删除这些项目的任务
-     * @param string|int $operatorId 限制只能删除该操作员创建的任务
+     * Delete tasks
+     * Can delete multiple tasks at once
+     * @param array $taskIds List of task IDs to delete
+     * @param array $projectIds Restrict deletion to tasks belonging to these projects only
+     * @param string|int $operatorId Restrict deletion to tasks created by this operator only
      */
     public function delete(array $taskIds, array $projectIds, $operatorId = '');
 }

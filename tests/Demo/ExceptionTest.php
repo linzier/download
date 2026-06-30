@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Test\Demo\Sample\FileNotFoundException;
 
 /**
- * 测试异常
+ * Testing Exceptions
  * Class ExceptionTest
  * @package Test\Demo
  */

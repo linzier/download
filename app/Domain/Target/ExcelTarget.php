@@ -5,36 +5,36 @@ namespace App\Domain\Target;
 use App\Domain\Target\Template\Excel\Tpl;
 
 /**
- * 目标文件：Excel
- * 为了处理上的一致性，将 multi_type = single（单表格模式）情况下的元数据也转成数组格式
+ * Target file: Excel
+ * For consistency in processing, metadata is also converted to array format in multi_type = single (single table mode)
  */
 class ExcelTarget extends Target
 {
-    // multi_type：page 模式，一个页面多个表格
+    // multi_type: page mode, multiple tables on one page
     public const MT_PAGE = 'page';
-    // multi_type：tab 模式，一个 excel 多个 tab，每个 tab 一个表格
+    // multi_type: tab mode, multiple tabs in one excel, one table per tab
     public const MT_TAB = 'tab';
-    // multi_type：single 模式，只有一个表格（默认模式）
+    // multi_type: single mode, only one table (default mode)
     public const MT_SINGLE = 'single';
 
-    // 表格标题，一维数组
+    // Table titles, 1D array
     protected $titles;
-    // 摘要，一维数组
+    // Summaries, 1D array
     protected $summaries;
-    // 表头，二维数组
+    // Headers, 2D array
     protected $headers;
-    // 表尾，二维数组
+    // Footers, 2D array
     protected $footers;
     protected $headersAlign;
-    // 表尾，二维数组
+    // Footers alignment, 2D array
     protected $footersAlign;
-    // 表格模板，一维数组（元素是 Tpl）
+    // Table templates, 1D array (elements are Tpl)
     protected $templates;
-    // 默认列宽度
+    // Default column width
     protected $defaultWidth;
-    // 默认行高度
+    // Default row height
     protected $defaultHeight;
-    // 多表格类型：page、tab、single
+    // Multi-table type: page, tab, single
     protected $multiType;
     protected $rowoffset;
 
@@ -128,8 +128,8 @@ class ExcelTarget extends Target
     }
 
     /**
-     * 重写 setMeta，将数组中的各部分赋值给相应的属性，让其更具有语义
-     * 注意，此处是增量覆盖
+     * Override setMeta to assign each part of the array to the corresponding properties for better semantics
+     * Note: this performs incremental overwrite
      */
     public function setMeta(array $metaData)
     {
@@ -148,13 +148,13 @@ class ExcelTarget extends Target
 
         if (isset($metaData['headers']) && $metaData['headers']) {
             $metaData['headers'] = is_string($metaData['headers']) ? json_decode($metaData['headers'], true) : $metaData['headers'];
-            // 确保是二维数组
+            // Ensure it is a 2D array
             $this->headers = is_array(reset($metaData['headers'])) ? $metaData['headers'] : [$metaData['headers']];
         }
         
         if (isset($metaData['footers']) && $metaData['footers']) {
             $metaData['footers'] = is_string($metaData['footers']) ? json_decode($metaData['footers'], true) : $metaData['footers'];
-            // 确保是二维数组
+            // Ensure it is a 2D array
             $this->footers = is_array(reset($metaData['footers'])) ? $metaData['footers'] : [$metaData['footers']];
         }
 
@@ -171,7 +171,7 @@ class ExcelTarget extends Target
         if (isset($metaData['templates']) && $metaData['templates']) {
             $this->setTpls($metaData['templates']);
         } elseif (!$this->templates && isset($metaData['data']) && $metaData['data']) {
-            // 如果没有静态 template，且有提供源数据，则试图从源数据解析出模板
+            // If no static template is provided but source data is available, attempt to parse a template from the source data
             $this->setTpls(Tpl::getDefaultTplFromData($metaData['data']));
         }
 
@@ -181,7 +181,7 @@ class ExcelTarget extends Target
     }
 
     /**
-     * 重写 getMeta
+     * Override getMeta
      */
     public function getMeta(string $key = '')
     {
@@ -203,7 +203,9 @@ class ExcelTarget extends Target
     }
 
     /**
-     * 由于 ExcelTarget 内部使用复数表示，但外面传入的可能是单数（单表格和多表格模式对外面的接口参数是一致的），此处需要做兼容处理
+     * ExcelTarget internally uses plural forms, but the caller may pass singular values
+     * (the interface parameters are consistent for both single and multi-table modes).
+     * This method handles the compatibility.
      */
     private function formateMetaData(array $meta): array
     {
@@ -219,7 +221,7 @@ class ExcelTarget extends Target
     }
 
     /**
-     * 表格模板
+     * Table templates
      */
     private function setTpls($templates)
     {
@@ -237,7 +239,7 @@ class ExcelTarget extends Target
             $templates = json_decode($templates, true);
         }
 
-        // 数组里面是 Tpl 实例
+        // Array contains Tpl instances
         if (reset($templates) instanceof Tpl) {
             $this->templates = $templates;
             return;
@@ -245,7 +247,7 @@ class ExcelTarget extends Target
 
         $templates = $this->formatSimpleTplConf($templates);
 
-        // 如果是单模板，则转成兼容模式
+        // If it is a single template, convert to compatible mode
         if ($this->isSingleTplCfg($templates)) {
             $templates = [$templates];
         }
@@ -270,7 +272,7 @@ class ExcelTarget extends Target
     }
 
     /**
-     * 判断是否单模板配置
+     * Check if the configuration is a single template
      */
     private function isSingleTplCfg(array $cfg): bool
     {

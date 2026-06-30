@@ -24,10 +24,10 @@ class Subject
 
     public function doSomething()
     {
-        // 做点什么
+        // Do something
         // ...
 
-        // 通知观察者发生了些什么
+        // Notify observers of what happened
         $this->notify('something');
     }
 

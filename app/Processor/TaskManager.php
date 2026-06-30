@@ -15,25 +15,25 @@ use Swoole\Coroutine;
 use WecarSwoole\Container;
 
 /**
- * 任务管理器
- * 任务管理器是单例，用来维护本进程中多个任务的生命周期
- * 一个任务对应一个工作流，因而任务管理器也维护工作流的生命周期
- * 注意：工作流的概念属于内部细节，任务管理器不能将该内部概念暴露给外部
+ * Task Manager
+ * The task manager is a singleton that maintains the lifecycle of multiple tasks within this process.
+ * Each task corresponds to a workflow, so the task manager also manages the workflow lifecycle.
+ * Note: The workflow concept is an internal detail; the task manager must not expose it externally.
  */
 class TaskManager
 {
     use Singleton;
 
-    // 工作中
+    // Working
     private const STATUS_WORKING = 1;
-    // 等待重启中（等待其它任务完成，此时不再接收新任务）
+    // Waiting for restart (waiting for other tasks to complete; no longer accepting new tasks)
     private const STATUS_STOP_WAITING = 2;
-    // 重启中
+    // Restarting
     private const STATUS_STOPPING = 3;
 
-    // 正在处理的工作流列表
+    // List of workflows currently being processed
     private $workFlows = [];
-    // 该任务管理器共处理了多少任务
+    // Total number of tasks processed by this task manager
     private $procCount;
     /**
      * @var LoggerInterface
@@ -54,50 +54,50 @@ class TaskManager
     }
 
     /**
-     * 投递任务
+     * Enqueue a task
      */
     public function deliver(Task $task)
     {
         $job = new Job();
         $job->setJobData(['task_id' => $task->id(), 'enqueue_time' => time()]);
         if (Queue::instance(Config::getInstance()->getConf('task_queue'))->producer()->push($job)) {
-            // 注意：以前的版本中此处会修改任务状态为已入列，但由于存在多进程并发问题，会导致并发改状态的问题（此处入列后另一个进程立马出列并处理），因而去掉此处的状态更新
-            $this->logger->info("投递任务到消息队列：{$task->id()}");
+            // Note: In earlier versions, the task status was updated to "enqueued" here. However, due to multi-process concurrency issues (another process may dequeue and process immediately after enqueueing), this status update has been removed to avoid race conditions.
+            $this->logger->info("Task enqueued to message queue: {$task->id()}");
         } else {
-            $this->logger->error("投递任务到消息队列失败：{$task->id()}");
+            $this->logger->error("Failed to enqueue task to message queue: {$task->id()}");
         }
     }
 
     /**
-     * 处理任务
+     * Process a task
      */
     public function process(Task $task)
     {
-        // 获取进程级别 ticket
+        // Acquire process-level ticket
         Ticket::get("task_source");
 
-        // 在新的协程中执行
+        // Execute in a new coroutine
         go(function () use ($task) {
             try {
-                // 将任务状态改成正在执行中
+                // Switch task status to in-progress
                 $this->taskSvr->switchStatus($task, Task::STATUS_DOING);
-                $this->logger->info("开始处理任务：{$task->id()}");
+                $this->logger->info("Start processing task: {$task->id()}");
                 $this->getWorkFlow($task)->start();
             } catch (\Throwable $e) {
-                // 将任务状态改成处理失败
+                // Switch task status to failed
                 try {
-                    $this->taskSvr->switchStatus($task, Task::STATUS_FAILED, "任务{$task->id()}处理异常：{$e->getMessage()}");
+                    $this->taskSvr->switchStatus($task, Task::STATUS_FAILED, "Task {$task->id()} processing error: {$e->getMessage()}");
                 } catch (\Throwable $e) {
-                    // 再抛异常则忽略
+                    // Ignore if re-throwing fails
                 }
-                $this->logger->error("任务{$task->id()}处理异常：{$e->getMessage()}");
+                $this->logger->error("Task {$task->id()} processing error: {$e->getMessage()}");
             } finally {
-                // 清理
+                // Cleanup
                 $this->clear($task);
-                // 归还 ticket
+                // Return ticket
                 Ticket::done("task_source");
                 $this->procCount++;
-                // 看是否需要重启任务管理器
+                // Check if task manager needs to be restarted
                 $this->tryToReboot();
             }
         });
@@ -110,11 +110,11 @@ class TaskManager
         }
 
         $this->status = self::STATUS_STOP_WAITING;
-        // 停止队列监听
+        // Stop queue listener
         QueueListener::stop();
 
-        // 循环检查工作流列表，当工作流列表为空，或者超过等待时间(15分钟)后重启当前进程
-        $this->logger->info("进程服役期满，将进入重启.pid:" . getmypid());
+        // Poll the workflow list until it is empty or the timeout (15 minutes) is reached, then restart the process
+        $this->logger->info("Process service term expired, initiating restart. pid:" . getmypid());
         $cnt = 0;
         while (!empty($this->workFlows) && $cnt++ < 900) {
             Coroutine::sleep(1);
@@ -126,13 +126,13 @@ class TaskManager
     private function stop()
     {
         $this->status = self::STATUS_STOPPING;
-        $this->logger->info("进程重启.pid:" . getmypid());
+        $this->logger->info("Process restarting. pid:" . getmypid());
         $server = ServerManager::getInstance()->getSwooleServer();
         $server->stop($server->worker_id, true);
     }
 
     /**
-     * 获取任务对应的工作流
+     * Get the workflow for the given task
      */
     private function getWorkFlow(Task $task): WorkFlow
     {
@@ -144,7 +144,7 @@ class TaskManager
     }
     
     /**
-     * 初始化工作流
+     * Initialize workflow
      */
     private function initWorkFlow(Task $task)
     {
@@ -156,17 +156,17 @@ class TaskManager
     }
 
     /**
-     * 任务处理结束后的清理工作
+     * Cleanup after task processing is complete
      */
     private function clear(Task $task)
     {
-        // 清理工作流
+        // Cleanup workflow
         if (isset($this->workFlows[$task->id()])) {
             $wStatus = $this->workFlows[$task->id()]->status();
             $this->workFlows[$task->id()]->destroy();
             unset($this->workFlows[$task->id()]);
 
-            $this->logger->info("清理工作流，任务{$task->id()}，工作流状态：{$wStatus}");
+            $this->logger->info("Workflow cleaned up, task {$task->id()}, workflow status: {$wStatus}");
         }
     }
 }

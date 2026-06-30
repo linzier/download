@@ -1,15 +1,17 @@
 <?php
 
 /**
- * 定时任务配置
- * 注意：目前这些配置不能通过 apollo() 从配置中心获取，因为一方面该配置是在服务启动前读取的，apollo() 函数
- * 尚未生效；另外更重要的，自定义进程无法通过 reload 重启，即配置中心修改配置后并不会生效
+ * Cron job configuration
+ * Note: Currently these configurations cannot be fetched from the configuration center via apollo(), because
+ * this configuration is read before the service starts and the apollo() function is not yet effective.
+ * More importantly, custom processes cannot be restarted via reload, so configuration changes from the
+ * configuration center will not take effect immediately.
  */
 return [
-    // 只在这些服务器上执行 crontab。必须配置
-    // 支持的格式：['192.168.0.23','172.16.0.31']，
-    // 或者按照环境指定: ['dev' => '192.168.0.23', 'produce' => '120.25.216.158']
-    // 注意这两种格式不兼容
+    // Only execute crontab on these servers. This configuration is required.
+    // Supported formats: ['192.168.0.23','172.16.0.31'],
+    // Or specify by environment: ['dev' => '192.168.0.23', 'produce' => '120.25.216.158']
+    // Note: These two formats are not compatible with each other
     'ip' => ['192.168.0.23'],
     'tasks' => []
 ];

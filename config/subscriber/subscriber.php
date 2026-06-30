@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 事件订阅
+ * Event subscriptions
  */
 return [
 ];

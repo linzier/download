@@ -5,18 +5,18 @@ namespace App\Domain\Target\Template\Excel;
 use App\Domain\Source\CSVSource;
 
 /**
- * Excel 表格模板
+ * Excel table template
  */
 class Tpl
 {
     use TplBuilder;
     
     /**
-     * @var ColHead 列标头
+     * @var ColHead Column header
      */
     private $col;
     /**
-     * @var RowHead 行标头
+     * @var RowHead Row header
      */
     private $row;
 
@@ -37,16 +37,16 @@ class Tpl
     }
 
     /**
-     * 从数据中解析默认模板
-     * $data 可以是一维、二维或者三维数组
-     * 一维、二维数组会解析出一维模板，三维数组（多表模式）会解析出二维模板（多表模板）
+     * Parse a default template from data
+     * $data can be a 1D, 2D, or 3D array
+     * 1D and 2D arrays produce a 1D template; 3D arrays (multi-table mode) produce a 2D template (multi-table template)
      * $data:
-     * 一维数组：
-     * ["name" => "张三", "age" => 89]
-     * 二维数组：
-     * [["name" => "张三", "age" => 89]]
-     * 三维数组：
-     * [[["name" => "张三", "age" => 89]],[["name" => "张三", "age" => 89]]]
+     * 1D array:
+     * ["name" => "Zhang San", "age" => 89]
+     * 2D array:
+     * [["name" => "Zhang San", "age" => 89]]
+     * 3D array:
+     * [[["name" => "Zhang San", "age" => 89]],[["name" => "Zhang San", "age" => 89]]]
      */
     public static function getDefaultTplFromData(array $data): array
     {
@@ -56,17 +56,17 @@ class Tpl
 
         $firstEle = reset($data);
         
-        // 一维数组
+        // 1D array
         if (!is_array($firstEle)) {
             return self::extractTplFromData($data);
         }
 
-        // 二维数组
+        // 2D array
         if (!is_array(reset($firstEle))) {
             return self::extractTplFromData($data[0]);
         }
 
-        // 三维数组
+        // 3D array
         $cfg = [];
         foreach ($data as $val) {
             $cfg[] = self::extractTplFromData($val[0]);

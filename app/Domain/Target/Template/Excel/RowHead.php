@@ -3,13 +3,13 @@
 namespace App\Domain\Target\Template\Excel;
 
 /**
- * 行标头
+ * Row header
  */
 class RowHead extends Node
 {
     use NodeParser;
 
-    // 节点关联的行数，只有叶子节点有效
+    // Number of rows associated with the node; only valid for leaf nodes
     private $rowCount;
 
     public function __construct(string $name = '', string $title = '', Style $style = null, int $rowCount = 1)
@@ -21,7 +21,7 @@ class RowHead extends Node
     }
 
     /**
-     * 叶节点关联的行数
+     * Number of rows associated with a leaf node
      */
     public function rowCount(): int
     {
@@ -29,7 +29,7 @@ class RowHead extends Node
     }
 
     /**
-     * 重写广度探测逻辑：遇到一个没有 children 的节点则广度加 row_count（该节点关联的行数）
+     * Override breadth detection logic: for a node without children, add row_count (the number of rows associated with this node) to the breadth
      */
     protected function detectBreadth(Node $node, int &$breadth = 0): int
     {

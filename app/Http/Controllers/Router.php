@@ -10,8 +10,8 @@ use EasySwoole\Http\Response;
 use WecarSwoole\Util\File;
 
 /**
- * Http 路由器入口
- * 不要在此处添加具体路由规则，具体的路由在 Routes 目录下按模块定义
+ * HTTP Router Entry
+ * Do not add specific route rules here. Define routes by module in the Routes directory.
  * Class Router
  * @package App\Http\Controllers
  */
@@ -22,23 +22,23 @@ class Router extends AbstractRouter
         $this->setMethodNotAllowCallBack(function (Request $request, Response $response) {
             $response->withStatus(404);
             $response->withHeader('Content-type','text/html;charset=UTF-8');
-            $response->write('未找到处理方法');
+            $response->write('Handler method not found');
             return false;
         });
 
         $this->setRouterNotFoundCallBack(function (Request $request, Response $response) {
             $response->withStatus(404);
             $response->withHeader('Content-type','text/html;charset=UTF-8');
-            $response->write('未找到路由匹配');
+            $response->write('Route not found');
             return false;
         });
 
-        // 加载具体路由
+        // Load specific routes
         $this->loadRoutes($routeCollector);
     }
 
     /**
-     * 加载具体的路由
+     * Load specific routes
      * @param RouteCollector $route
      */
     protected function loadRoutes(RouteCollector $route)

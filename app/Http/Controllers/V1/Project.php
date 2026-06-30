@@ -22,7 +22,7 @@ class Project extends Controller
     }
 
     /**
-     * 创建项目
+     * Create project
      */
     public function createProject()
     {
@@ -31,7 +31,7 @@ class Project extends Controller
     }
 
     /**
-     * 创建项目组
+     * Create project group
      */
     public function createGroup()
     {

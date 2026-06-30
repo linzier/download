@@ -9,14 +9,14 @@ use App\Domain\Target\Template\Excel\Tpl;
 trait ParamUtil
 {
     /**
-     * 对参数做一些处理
+     * Process parameters
      * @param array $params
      * @return array
      */
     public static function dealParams(array $params): array
     {
-        // 目前只需要处理 col_align
-        // 将 col_align 参数植入到 template 中
+        // Currently only need to handle col_align
+        // Inject col_align parameter into the template
         if (!isset($params['col_align']) || !$params['col_align'] || !isset($params['template']) || !$params['template']) {
             return $params;
         }
@@ -27,7 +27,7 @@ trait ParamUtil
         if (isset($params['multi_type']) && $params['multi_type'] != ExcelTarget::MT_SINGLE) {
             $cnt = count($tplCfg);
 
-            // 多表格
+            // Multiple tables
             if (is_string($align)) {
                 if (in_array($align, [Style::ALIGN_LEFT, Style::ALIGN_CENTER, Style::ALIGN_RIGHT])) {
                     $align = array_pad([], $cnt, $align);
@@ -42,7 +42,7 @@ trait ParamUtil
             }
             $params['template'] = $tpls;
         } else {
-            // 单表格
+            // Single table
             $params['template'] = self::innerDealTpl($tplCfg, $align);
         }
 
@@ -51,11 +51,11 @@ trait ParamUtil
 
     private static function innerDealTpl(array $tplCfg, string $align): array
     {
-        // 先格式化
+        // Format first
         $rowCfg = Tpl::formatConf($tplCfg['row'] ?? []);
         $colCfg = Tpl::formatConf($tplCfg['col'] ?? $tplCfg);
 
-        // 对 colCfg 应用 col_align
+        // Apply col_align to colCfg
         self::innerDealColStyle($colCfg, $align);
 
         return ['row' => $rowCfg, 'col' => $colCfg];
@@ -65,7 +65,7 @@ trait ParamUtil
     {
         foreach ($colCfg as &$col) {
             if (!isset($col['children']) || !$col['children']) {
-                // 找到叶子节点
+                // Found leaf node
                 $style = $col['style'] ?? [];
 
                 if (!isset($style['align']) || !$style['align']) {
@@ -77,7 +77,7 @@ trait ParamUtil
                 continue;
             }
 
-            // 继续往下找
+            // Continue searching deeper
             self::innerDealColStyle($col['children'], $colAlign);
         }
     }

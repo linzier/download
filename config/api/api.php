@@ -6,38 +6,38 @@ use WecarSwoole\Client\Http\Middleware\LogRequestMiddleware;
 use WecarSwoole\Client\Http\Middleware\MockRequestMiddleware;
 
 /**
- * 外部 api 定义
- * 可支持多种协议（典型如 http 协议，rpc 协议）
- * api 外部使用方式：group_name:apiname
+ * External API definitions
+ * Supports multiple protocols (typically HTTP, RPC)
+ * External API usage format: group_name:apiname
  */
 return [
     'config' => [
-        // 请求协议
-        'protocol' => 'http', // 支持的协议：http、rpc（尚未实现）
-        // http 协议请求默认配置
+        // Request protocol
+        'protocol' => 'http', // Supported protocols: http, rpc (not yet implemented)
+        // HTTP protocol request default configuration
         'http' => [
-            // 请求参数组装器
+            // Request parameter assembler
             'request_assembler' => DefaultHttpRequestAssembler::class,
-            // 响应参数解析器
+            // Response parameter parser
             'response_parser' => JsonResponseParser::class,
-            // 请求中间件，必须实现 \WecarSwoole\Client\Http\Middleware\IRequestMiddleware 接口
+            // Request middlewares, must implement \WecarSwoole\Client\Http\Middleware\IRequestMiddleware interface
             'middlewares' => [
                 LogRequestMiddleware::class,
                 MockRequestMiddleware::class
             ],
-            'throw_exception' => true, // 当返回不是 20X 时是否抛出异常
-            // https ssl 相关配置
+            'throw_exception' => true, // Whether to throw an exception when the response is not 20X
+            // HTTPS SSL configuration
             'ssl' => [
-                // CA 文件路径
+                // CA file path
                 'cafile' => '',
-                // 是否验证服务器端证书
+                // Whether to verify the server certificate
                 'ssl_verify_peer' => false,
-                // 是否允许自签名证书
+                // Whether to allow self-signed certificates
                 'ssl_allow_self_signed' => true
             ]
         ],
         'default_retry_num' => 2,
     ],
-    // 组
+    // API groups
     'weicheche' => include_once __DIR__ . '/weicheche.php'
 ];

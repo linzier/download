@@ -32,7 +32,7 @@ class MySQLProjectRepository extends MySQLRepository implements IProjectReposito
         ->execute();
 
         if (!$this->query->affectedRows()) {
-            throw new Exception("保存项目信息失败");
+            throw new Exception("Failed to save project information");
         }
     }
 
@@ -102,7 +102,7 @@ class MySQLProjectRepository extends MySQLRepository implements IProjectReposito
         ->execute();
 
         if (!$this->query->affectedRows()) {
-            throw new Exception("保存项目组信息失败");
+            throw new Exception("Failed to save project group information");
         }
     }
 

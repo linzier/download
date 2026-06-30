@@ -19,7 +19,7 @@ use EasySwoole\Component\Timer as EsTimer;
 use Swoole\Event;
 
 /**
- * 后台守卫程序，执行失败重试、数据归档的任务
+ * Background daemon process that handles failed task retries and data archival.
  * Class Defender
  */
 class Defender extends AbstractProcess
@@ -38,47 +38,47 @@ class Defender extends AbstractProcess
 
     public function run($arg)
     {
-        // easyswoole 的AbstractProcess存在bug：对SIGTERM捕获后没有终止当前进程，导致进程无法终止，从而导致整个服务无法被SIGTERM终止
-        // 此处做终止处理
-        // 覆盖掉 AbstractProcess 中的事件注册
+        // EasySwoole's AbstractProcess has a bug: it catches SIGTERM without terminating the current process,
+        // making it impossible to stop the process and thereby preventing the entire service from being stopped via SIGTERM.
+        // Override the signal handler registered in AbstractProcess to handle termination properly.
         Process::signal(SIGTERM, function () {
-            Process::signal(SIGTERM, null);// 先取消掉该信号处理器
-            swoole_event_del($this->swProcess->pipe);// 删除管道上的事件循环
-            EsTimer::getInstance()->clearAll();// 清除定时器
-            Event::exit();// 退出事件循环
-            Process::kill($this->getPid(), SIGTERM);// 再发一次SIGTERM终止当前进程
+            Process::signal(SIGTERM, null);// Unregister this signal handler first
+            swoole_event_del($this->swProcess->pipe);// Remove event loop on the pipe
+            EsTimer::getInstance()->clearAll();// Clear all timers
+            Event::exit();// Exit event loop
+            Process::kill($this->getPid(), SIGTERM);// Send SIGTERM again to terminate the current process
         });
 
         Bootstrap::boot();
 
         $this->logger = Container::get(LoggerInterface::class);
-        $this->logger->info('启动守卫程序');
+        $this->logger->info('Starting daemon process');
 
-        // 只有主服才执行的逻辑
+        // Logic that runs only on the master server
         if (self::isMaster()) {
-            $this->logger->info("启动主服守卫程序");
+            $this->logger->info("Starting master server daemon");
             self::addMasterFlag();
             $this->masterDefender();
         }
 
-        // 30 分钟一次，清理目录中的无用文件
+        // Every 30 minutes, clean up unused files in the directory
         Timer::tick(1800000, Closure::fromCallable([$this, 'clearDir']));
     }
 
     private static function isMaster(): bool
     {
-        // 先看环境变量
+        // Check environment variable first
         $master = getenv('WECARSWOOLE_MASTER');
         if ($master && trim($master) == 1) {
             return true;
         }
 
-        // 看常量
+        // Check constant
         if (defined('WECARSWOOLE_MASTER') && WECARSWOOLE_MASTER) {
             return true;
         }
 
-        // 看ip配置（历史兼容）
+        // Check IP configuration (legacy compatibility)
         $masterIp = Config::getInstance()->getConf('master_server');
         if ($masterIp && in_array($masterIp, swoole_get_local_ip())) {
             return true;
@@ -111,16 +111,16 @@ class Defender extends AbstractProcess
 
     private function masterDefender()
     {
-        // 15 秒一次，执行失败重试
+        // Every 15 seconds, retry failed tasks
         Timer::tick(15000, Closure::fromCallable([TaskRetry::getInstance(), 'watch']));
-        // 30 秒一次，检测队列状态
+        // Every 30 seconds, monitor queue status
         Timer::tick(30000, Closure::fromCallable([QueueMonitor::getInstance(), 'watch']));
-        // 3 小时一次，归档 task 数据
+        // Every 3 hours, archive task data
         Timer::tick(10800000, Closure::fromCallable([$this, 'fileData']));
     }
 
     /**
-     * 清理最后修改时间是 6 小时前的目录
+     * Clean up directories with last modified time older than 6 hours
      */
     private function clearDir()
     {
@@ -140,18 +140,18 @@ class Defender extends AbstractProcess
                 LocalFile::deleteDir($realDir);
             }
         } catch (\Exception $e) {
-            $this->logger->error("守卫进程执行异常。msg:{$e->getMessage()},trace:" . $e->getTraceAsString());
+            $this->logger->error("Daemon process exception. msg:{$e->getMessage()},trace:" . $e->getTraceAsString());
         }
     }
 
     /**
-     * 归档 3 个月前的数据
+     * Archive data older than 3 months
      */
     private function fileData()
     {
         $hour = intval(date('G'));
 
-        // 只在晚上 0 - 6 点处理
+        // Only process between 0:00 and 6:00
         if ($hour > 6) {
             return;
         }
@@ -161,7 +161,7 @@ class Defender extends AbstractProcess
         try {
             Container::get(ITaskRepository::class)->fileTask(time() - 86400 * 30 * 3, $optimize);
         } catch (\Exception $e) {
-            $this->logger->error("守卫进程执行异常。msg:{$e->getMessage()},trace:" . $e->getTraceAsString());
+            $this->logger->error("Daemon process exception. msg:{$e->getMessage()},trace:" . $e->getTraceAsString());
         }
     }
 }

@@ -6,16 +6,16 @@ use App\Domain\Target\Target;
 use App\Foundation\Client\API;
 
 /**
- * 源数据服务
+ * Source Data Service
  */
 class SourceService
 {
     /**
-     * 获取数据
+     * Fetch data
      */
     public function fetch(ISource $source, Target $target)
     {
-        // 获取数据
+        // Fetch data
         $source->fetch(new API(), $target->type());
     }
 }

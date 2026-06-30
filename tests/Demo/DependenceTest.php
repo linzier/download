@@ -5,8 +5,8 @@ namespace Test\Demo;
 use PHPUnit\Framework\TestCase;
 
 /**
- * 测试用例依赖关系申明
- * 注意：最好不要写此中有依赖关系的测试代码
+ * Test Case Dependency Declaration
+ * Note: It is best to avoid writing tests with dependencies between them.
  * Class DependenceTest
  * @see https://phpunit.readthedocs.io/zh_CN/latest/writing-tests-for-phpunit.html
  * @package Test\Demo
@@ -22,7 +22,7 @@ class DependenceTest extends TestCase
     }
 
     /**
-     * 测试依赖关系
+     * Test dependency
      * @param array $arr
      * @depends testArray
      * @return array

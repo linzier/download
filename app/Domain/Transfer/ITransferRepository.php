@@ -5,22 +5,22 @@ namespace App\Domain\Transfer;
 interface ITransferRepository
 {
     /**
-     * 添加新 ticket
+     * Save a new download ticket
      */
     public function saveDownloadTicket(DownloadTicket $ticket);
 
     /**
-     * 根据 id 查询 ticket
+     * Get a download ticket by ID
      */
     public function getDownloadTicket(string $ticketId): ?DownloadTicket;
 
     /**
-     * 保存任务下载次数
+     * Save task download count
      */
     public function saveDownloadTimer(DownloadTimer $timer);
 
     /**
-     * 查询任务下载次数
+     * Get task download count
      */
     public function getDownloadTimer(string $taskId): ?DownloadTimer;
 }

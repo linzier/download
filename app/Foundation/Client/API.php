@@ -35,8 +35,8 @@ class API
     }
 
     /**
-     * 如果调用失败，则最多重试 3 次，每次重试间隔逐渐拉长
-     * 注意：此处的重试对于当前协程来说是阻塞的，会发生协程切换
+     * On failure, retries up to 3 times with increasing intervals between attempts.
+     * Note: retries are blocking for the current coroutine and will trigger coroutine switching.
      * @return array
      */
     public function invoke(array $params): array
@@ -45,7 +45,7 @@ class API
 
         $result = $this->retryCall($params);
         if (!$result || $result->getStatus() >= 300) {
-            throw new Exception("url 请求失败：{$this->url}。errno:{$this->lastErrNo},errmsg:{$this->lastErrMsg}", ErrCode::FETCH_SOURCE_FAILED);
+            throw new Exception("URL request failed: {$this->url}. errno:{$this->lastErrNo}, errmsg:{$this->lastErrMsg}", ErrCode::FETCH_SOURCE_FAILED);
         }
 
         return $result->getBody() ?: [];
@@ -69,7 +69,7 @@ class API
                     ]
                 );
 
-                // HTTP 状态码不是 20X 则重试
+                // Retry if HTTP status code is not 20X
                 if ($result && $result->getStatus() >= 200 && $result->getStatus() < 300) {
                     $this->lastErrNo = 0;
                     $this->lastErrMsg = '';
@@ -83,10 +83,10 @@ class API
             $this->lastErrMsg = $result->getMessage();
 
             Co::sleep($this->calcIntervalTime());
-            Container::get(LoggerInterface::class)->warning("第{$this->retryNum}次重试{$this->url}，params:{$paramsStr}，原因：{$this->lastErrMsg},http code:{$this->lastErrNo}");
+            Container::get(LoggerInterface::class)->warning("Retry #{$this->retryNum} for {$this->url}, params:{$paramsStr}, reason: {$this->lastErrMsg}, http code:{$this->lastErrNo}");
         }
 
-        return $result === null ? new JsonArrayResponse([], 500, self::MAX_RETRY_NUM . "次重试失败:{$this->url}，params:{$paramsStr}") : $result;
+        return $result === null ? new JsonArrayResponse([], 500, self::MAX_RETRY_NUM . " retries failed: {$this->url}, params:{$paramsStr}") : $result;
     }
 
     private function calcIntervalTime(): int

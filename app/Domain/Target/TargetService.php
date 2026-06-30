@@ -11,16 +11,16 @@ use App\Exceptions\TargetException;
 use EasySwoole\EasySwoole\Config;
 
 /**
- * 目标文件服务
+ * Target file service
  */
 class TargetService
 {
     /**
-     * 生成目标文件
+     * Generate target file
      */
     public function generate(ISource $source, Target $target, bool $compressFile = true)
     {
-        // 生成器
+        // Generator
         switch ($target->type()) {
             case Target::TYPE_CSV:
                 $generator = new CSVGenerator();
@@ -29,10 +29,10 @@ class TargetService
                 $generator = new ExcelGenerator();
                 break;
             default:
-                throw new TargetException("不支持的目标文件类型：{$target->type()}", ErrCode::FILE_TYPE_ERR);
+                throw new TargetException("Unsupported target file type: {$target->type()}", ErrCode::FILE_TYPE_ERR);
         }
 
-        // 压缩器
+        // Compressor
         if ($compressFile) {
             switch (Config::getInstance()->getConf('zip_type')) {
                 case COMPRESS_TYPE_ZIP:

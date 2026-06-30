@@ -7,7 +7,7 @@ use WecarSwoole\Entity;
 use WecarSwoole\ID\IIDGenerator;
 
 /**
- * 项目
+ * Project
  */
 class Project extends Entity
 {

@@ -15,27 +15,29 @@ use Psr\Log\LoggerInterface;
 use WecarSwoole\Container;
 
 /**
- * 任务失败重试
- * 只处理 24 小时内创建的
- * 以下状态需要重试：
- *  1. 待处理（状态码：1，未入列）：
- *      a. 入列失败；
- *      b. 入列成功但改状态失败；
- *      c. 从其它异常状态转成待处理状态的；
- *    重试方案：15 分钟重试，直接入列
- *  2. 已入列（状态码：2）：
- *      a. 队列崩溃；
- *      b. 队列堵塞；
- *      c. 取出后改状态前程序崩溃；
- *    重试方案：入列 10 分钟内的不处理；超过 10 分钟的，先判断队列是否为空，如果队列不为空，则超过 30 分钟的处理，30 分钟内的不处理；队列为空，则立即处理。
- *            处理方式：将状态改成“待处理”
- *  3. 处理中（状态码：3）：
- *      a. 程序还在处理；
- *      b. 程序挂了；
- *    重试方案：超过 1 小时的重新处理（时间可配置，可在投递任务接口传参设置）
- *  4. 可重试失败（状态码：5）：
- *    重试方案：立即将状态改成待处理；
- * 注意：以上都是先将状态改成“待处理”，然后再入列，因为在状态机设置上，只有待处理状态的才能入列
+ * Failed task retry mechanism.
+ * Only processes tasks created within the last 24 hours.
+ * The following statuses require retry:
+ *  1. Pending (status code: 1, not enqueued):
+ *      a. Enqueue failed;
+ *      b. Enqueue succeeded but status update failed;
+ *      c. Transitioned to pending from another abnormal status;
+ *    Retry strategy: retry after 15 minutes by enqueuing directly.
+ *  2. Enqueued (status code: 2):
+ *      a. Queue crashed;
+ *      b. Queue is blocked;
+ *      c. Process crashed after dequeue but before status update;
+ *    Retry strategy: skip if enqueued within 10 minutes; after 10 minutes, check if the queue is empty --
+ *            if not empty, retry tasks enqueued over 30 minutes ago; if empty, retry immediately.
+ *            Retry method: reset status to "pending".
+ *  3. In progress (status code: 3):
+ *      a. Task is still being processed;
+ *      b. Process has crashed;
+ *    Retry strategy: retry tasks running over 1 hour (configurable; can be set per task via the submission API).
+ *  4. Retryable failure (status code: 5):
+ *    Retry strategy: immediately reset status to pending.
+ * Note: In all cases above, the status is first changed to "pending" before enqueuing,
+ * because the state machine only allows enqueuing from the pending status.
  */
 class TaskRetry
 {
@@ -81,14 +83,14 @@ class TaskRetry
                     continue;
                 }
                 
-                // 需要重新处理
+                // Needs reprocessing
                 $task = TaskFactory::create($taskDTO);
-                // 先将任务状态改成“待处理”，否则后面状态切换会失败
+                // Reset task status to "pending" first, otherwise subsequent status transition will fail
                 if ($taskDTO->status != Task::STATUS_TODO) {
                     $this->taskSvr->switchStatus($task, Task::STATUS_TODO);
                 }
 
-                // 投递任务
+                // Submit the task
                 TaskManager::getInstance()->deliver($task);
             } catch (\Throwable $e) {
                 $this->logger->error("retry task error.enqueue error:{$e->getMessage()}");
@@ -101,20 +103,20 @@ class TaskRetry
         $now = time();
         switch ($taskDTO->status) {
             case Task::STATUS_TODO:
-                // 待处理，用任务创建时间比较
+                // Pending: compare by task creation time
                 return $taskDTO->ctime <= $now - 60 * 15;
             case Task::STATUS_ENQUEUED:
-                // 已入列，30s 内的不处理
+                // Enqueued: skip if enqueued within 30 seconds
                 if ($taskDTO->qtime > $now - 30) {
                     return false;
                 }
 
-                // 看看队列情况，队列空的话需要立即处理（队列里面没有该任务，说明很可能处理异常）
+                // Check queue status: if the queue is empty, retry immediately (task missing from queue likely indicates abnormal processing)
                 if (!Queue::instance(Config::getInstance()->getConf('task_queue'))->size()) {
                     return true;
                 }
 
-                // 30 分钟后的处理
+                // Retry if enqueued over 30 minutes ago
                 return $taskDTO->qtime <= $now - 60 * 30;
             case Task::STATUS_DOING:
                 $expire = $taskDTO->maxExecTime ?: Config::getInstance()->getConf('max_exec_time') ?: 3600;

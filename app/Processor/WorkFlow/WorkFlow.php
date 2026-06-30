@@ -14,41 +14,42 @@ use Psr\Log\LoggerInterface;
 use WecarSwoole\Container;
 
 /**
- * 工作流
- * 使用链表实现调用链
+ * Workflow
+ * Implements a handler chain using a linked list
  */
 class WorkFlow
 {
     use Singleton;
 
     /**
-     * 工作流状态定义
-     * 除了初始态和结束态，其他状态必须要有对应的节点处理程序
+     * Workflow status definitions
+     * Every status except the initial and terminal states must have a corresponding handler.
      */
-    // 工作流初始化（该状态没有对应的节点处理程序，仅用来标志工作流初始态）
+    // Workflow initialized (no handler; marks the initial state only)
     public const WF_INIT = 1;
-    // 待处理
+    // Pending
     public const WF_TODO = 2;
-    // 源数据就绪（源数据已经全部拉到本地形成临时文件。注意：对方接口返回空数据也认为是就绪）
+    // Source data ready (all source data has been pulled to local temp files; note: an empty response from the remote API also counts as ready)
     public const WF_SOURCE_READY = 3;
-    // 源数据获取失败 （未成功获取全部源数据，可能对方接口不可用）
+    // Source data fetch failed (not all source data was retrieved; the remote API may be unavailable)
     public const WF_SOURCE_FAILED = 4;
-    // 目标文件就绪（已生成目标文件到本地）
+    // Target file ready (target file has been generated locally)
     public const WF_OBJECT_READY = 5;
-    // 目标文件生成失败
+    // Target file generation failed
     public const WF_OBJECT_FAILED = 6;
-    // 上传完成
+    // Upload succeeded
     public const WF_UPLOAD_SUC = 7;
-    // 上传失败
+    // Upload failed
     public const WF_UPLOAD_FAILED = 8;
-    // 通知客户端完成
+    // Client notification succeeded
     public const WF_NOTIFY_DONE = 9;
+    // Client notification failed
     public const WF_NOTIFY_FAIL = 10;
 
-    // 工作流第一个执行节点
+    // First handler node in the workflow
     private const FIRST_STATUS = self::WF_TODO;
 
-    // 哪些状态表示工作流执行失败
+    // Statuses that indicate workflow failure
     private const FAILED_ENDS = [
         self::WF_SOURCE_FAILED,
         self::WF_OBJECT_FAILED,
@@ -57,22 +58,22 @@ class WorkFlow
     ];
 
     /**
-     * @var WorkHandler 工作流头节点处理程序，用来启动职责链的调用
+     * @var WorkHandler Head handler node, used to initiate the handler chain
      */
     private $head;
     /**
-     * @var WorkHandler 尾节点处理程序，用来添加新的处理程序
+     * @var WorkHandler Tail handler node, used to append new handlers
      */
     private $tail;
     /**
-     * @var Task 工作流对应的任务
+     * @var Task The task associated with this workflow
      */
     private $task;
     /**
-     * @var int 工作流当前执行状态
+     * @var int Current workflow execution status
      */
     private $currentStatus;
-    // 该工作流能够处理的状态（节点）列表
+    // List of statuses (handler nodes) this workflow can handle
     private $handleStatus = [];
 
     private function __construct(Task $task)
@@ -82,7 +83,7 @@ class WorkFlow
     }
 
     /**
-     * 工作流对应的任务
+     * Get the task associated with this workflow
      */
     public function task(): Task
     {
@@ -90,7 +91,7 @@ class WorkFlow
     }
 
     /**
-     * 工作流当前状态
+     * Get the current workflow status
      */
     public function status(): int
     {
@@ -98,7 +99,7 @@ class WorkFlow
     }
 
     /**
-     * 启动工作流
+     * Start the workflow
      */
     public function start()
     {
@@ -110,14 +111,15 @@ class WorkFlow
     }
 
     /**
-     * 通知工作流执行
-     * 由于有些步骤可能是在单独的子协程或者 task 进程中执行的，只能通过调用此方法异步通知来告知工作流引擎当前是什么进度
+     * Notify the workflow to advance to the given status.
+     * Some steps may run in separate coroutines or task worker processes,
+     * so this method is used to asynchronously notify the workflow engine of the current progress.
      */
     public function notify(int $workStatus, string $msg = '')
     {
         $this->currentStatus = $workStatus;
         if (!in_array($workStatus, $this->handleStatus)) {
-            // 没有处理程序处理该状态，结束工作流
+            // No handler for this status; finalize the workflow
             return $this->finishWorkFlow($workStatus, $msg);
         }
 
@@ -125,7 +127,7 @@ class WorkFlow
     }
 
     /**
-     * 由于 WorkFlow 和 WorkHandler 之间存在双向（循环）引用，因而需要手动销毁工作流，解除循环引用
+     * Manually destroy the workflow to break circular references between WorkFlow and WorkHandler.
      */
     public function destroy()
     {
@@ -133,13 +135,13 @@ class WorkFlow
     }
 
     /**
-     * 创建一个新的工作流
+     * Create a new workflow
      */
     public static function newWorkFlow(Task $task): WorkFlow
     {
         $workFlow = new self($task);
 
-        // 添加节点处理程序
+        // Register handler nodes
         $workFlow->addHandler(new ToDoHandler($workFlow))
              ->addHandler(new SourceReadyHandler($workFlow))
              ->addHandler(new TargetReadyHandler($workFlow))
@@ -152,16 +154,16 @@ class WorkFlow
     {
         $task = $this->task;
         try {
-            // 修改任务状态
+            // Update task status
             Container::get(TaskService::class)->switchStatus($task, !in_array($status, self::FAILED_ENDS) ? Task::STATUS_SUC : Task::STATUS_FAILED, $msg);
-            Container::get(LoggerInterface::class)->info("任务处理结束：{$task->id()}，任务状态：{$task->status()}，msg：{$msg}");
+            Container::get(LoggerInterface::class)->info("Task processing finished: {$task->id()}, task status: {$task->status()}, msg: {$msg}");
         } catch (\Throwable $e) {
-            Container::get(LoggerInterface::class)->error("任务处理结束：{$task->id()}，任务状态：{$task->status()}，msg：{$msg}。但切换状态失败，异常：" . $e->getMessage() . "。trace：" . $e->getTraceAsString());
+            Container::get(LoggerInterface::class)->error("Task processing finished: {$task->id()}, task status: {$task->status()}, msg: {$msg}. Status transition failed, exception: " . $e->getMessage() . ". trace: " . $e->getTraceAsString());
         }
     }
 
     /**
-     * 执行工作流节点
+     * Execute a workflow handler node
      */
     protected function handle(int $workStatus)
     {
@@ -169,7 +171,7 @@ class WorkFlow
     }
 
     /**
-     * 添加节点处理程序
+     * Register a handler node
      */
     private function addHandler(WorkHandler $workHandler): WorkFlow
     {

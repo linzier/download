@@ -20,7 +20,7 @@ return [
     'critical' => [
         'mailer' => [
             'driver' => 'default',
-            'subject' => '下载中心告警',
+            'subject' => 'Download Center Alert',
             'to' => []
         ],
         'file' => File::join(EASYSWOOLE_ROOT, 'storage/logs/error.log'),
@@ -28,7 +28,7 @@ return [
     'emergency' => [
         'mailer' => [
             'driver' => 'default',
-            'subject' => '下载中心告警',
+            'subject' => 'Download Center Alert',
             'to' => []
         ],
         'file' => File::join(EASYSWOOLE_ROOT, 'storage/logs/error.log'),

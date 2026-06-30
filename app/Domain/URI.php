@@ -7,7 +7,7 @@ use WecarSwoole\Exceptions\Exception;
 
 /**
  * URI
- * 支持空 URI，及 protocol 类型为 PROTO_NONE
+ * Supports empty URIs and the PROTO_NONE protocol type
  */
 class URI
 {
@@ -34,7 +34,7 @@ class URI
     }
 
     /**
-     * 目前进支持 http，如果有其他协议，请创建子类处理
+     * Currently only HTTP is supported; for other protocols, create a subclass
      */
     protected function setProtocol(string $url)
     {
@@ -44,7 +44,7 @@ class URI
         }
 
         if (strpos($url, 'http') !== 0) {
-            throw new Exception("暂不支持的协议类型。原始 url：{$url}");
+            throw new Exception("Unsupported protocol type. Original URL: {$url}");
         }
 
         $this->protocol = self::PROTO_HTTP;
@@ -58,7 +58,7 @@ class URI
         }
 
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
-            throw new Exception("Url格式不合法", ErrCode::PARAM_VALIDATE_FAIL);
+            throw new Exception("Invalid URL format", ErrCode::PARAM_VALIDATE_FAIL);
         }
 
         $this->url = $url;

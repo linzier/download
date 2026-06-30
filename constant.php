@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 常量定义
+ * Constant definitions
  */
 defined('ZERO_AS_NULL') or define('ZERO_AS_NULL', 1);
 defined('EMPTY_STR_AS_NULL') or define('EMPTY_STR_AS_NULL', 2);

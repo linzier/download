@@ -3,7 +3,7 @@
 namespace App\Processor\Monitor;
 
 /**
- * 链表节点
+ * Linked list node
  */
 class SizeNode
 {

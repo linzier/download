@@ -11,32 +11,33 @@ use WecarSwoole\Entity;
 use WecarSwoole\Exceptions\Exception;
 
 /**
- * 任务类
+ * Task class
  */
 class Task extends Entity
 {
-    // 待处理（未入列）
+    // Pending (not enqueued)
     public const STATUS_TODO = 1;
-    // 已入列
+    // Enqueued
     public const STATUS_ENQUEUED = 2;
-    // 处理中（已出列处理）
+    // Processing (dequeued and being processed)
     public const STATUS_DOING = 3;
-    // 处理成功
+    // Processing succeeded
     public const STATUS_SUC = 4;
-    // 处理失败（该失败可重试，重试次数超限则会转入 STATUS_ERR）
+    // Processing failed (retryable; if retry limit is exceeded, status transitions to STATUS_ERR)
     public const STATUS_FAILED = 5;
-    // 处理失败，该失败不可重试
+    // Processing failed, non-retryable
     public const STATUS_ERR = 6;
-    // 已过期（该状态是程序算出来的，不会写入数据库）
+    // Expired (this status is computed programmatically and is not persisted to the database)
     public const STATUS_EXPIRED = 100;
-    // 最大处理次数
+    // Maximum number of processing attempts
     public const MAX_RETRY_NUM = 3;
 
     /**
-     * 状态转换表（状态机的查找表实现）
-     * 二维数组的第一维的 key 表示当前状态，第二维的 key 表示新状态，第二维的 value 表示是否允许该状态转换
-     * (注意状态的值是从 1 开始，而数组下标是从 0 开始，即将状态值 - 1)
-     * （自己到自己如状态 a -> a 被认为是允许的，实际是没有任何转换）
+     * State transition table (lookup table implementation of the state machine)
+     * The first dimension key represents the current state, the second dimension key represents the new state,
+     * and the second dimension value indicates whether the transition is allowed.
+     * (Note: state values start from 1, while array indices start from 0, so subtract 1 from the state value.)
+     * (Self-transitions such as state a -> a are considered allowed; in practice no transition occurs.)
      */
     private const STATUS_TRANS_MAP = [
         [true, true, true, false, false, false],
@@ -47,41 +48,41 @@ class Task extends Entity
         [false, false, false, false, false, true],
     ];
 
-    // 任务 id
+    // Task ID
     protected $id;
-    // 任务名称
+    // Task name
     protected $name;
-    // 所属的项目
+    // Owning project
     protected $project;
-    // 数据源
+    // Data source
     protected $source;
-    // 目标文件
+    // Target file
     protected $target;
-    // 回调通知 uri
+    // Callback notification URI
     protected $callback;
-    // 操作者编号
+    // Operator ID
     protected $operator;
-    // 商户
+    // Merchant
     protected $merchant;
-    // 任务执行时限
+    // Task execution time limit
     protected $maxExecTime;
-    // 任务创建时间
+    // Task creation time
     protected $createTime;
-    // 任务最后处理时间
+    // Last task execution time
     protected $lastExecTime;
-    // 任务执行成功的时间
+    // Task success completion time
     protected $finishedTime;
-    // 最后状态修改时间
+    // Last status change time
     protected $lastChangeStatusTime;
-    // 最后入列时间
+    // Last enqueue time
     protected $lastEnqueueTime;
-    // 任务状态
+    // Task status
     protected $status;
-    // 处理次数（包括第一次处理）
+    // Number of processing attempts (including the first attempt)
     protected $retryNum;
-    // 处理失败原因
+    // Failure reason
     protected $failedReason;
-    // 是否同步任务
+    // Whether this is a synchronous task
     protected $isSync;
 
     public function __construct(
@@ -115,7 +116,7 @@ class Task extends Entity
         $this->isSync = $isSync;
         $this->merchant = $merchant;
 
-        // 同步任务直接将状态设置为 suc
+        // For synchronous tasks, set status directly to suc
         if ($isSync) {
             $this->status = self::STATUS_SUC;
             $this->retryNum = 1;
@@ -179,11 +180,11 @@ class Task extends Entity
     }
 
     /**
-     * 更改任务状态
+     * Change task status
      */
     public function switchStatus(int $newStatus, string $failedReason = '')
     {
-        // 如果新状态是可重试失败，则要检查重试次数是否已经用完，如用完，则将状态改为不可重试的失败
+        // If the new status is retryable failure, check whether the retry limit has been reached; if so, change to non-retryable failure
         if ($newStatus === self::STATUS_FAILED && $this->retryNum >= self::MAX_RETRY_NUM) {
             $newStatus = self::STATUS_ERR;
         }
@@ -212,18 +213,18 @@ class Task extends Entity
 
     private function validateStatusChange(int $newStatus)
     {
-        // 查找表数组下表从 0 开始，要用状态值 - 1
+        // Lookup table indices start from 0, so subtract 1 from the state value
         $newPos = $newStatus - 1;
         $oldPos = $this->status - 1;
 
         if (!isset(self::STATUS_TRANS_MAP[$oldPos][$newPos])) {
-            throw new Exception("非法的状态值：{$newStatus}", ErrCode::INVALID_STATUS_OP);
+            throw new Exception("Invalid status value: {$newStatus}", ErrCode::INVALID_STATUS_OP);
         }
 
         $canTrans = self::STATUS_TRANS_MAP[$oldPos][$newPos];
 
         if (!$canTrans) {
-            throw new Exception("非法的状态切换：{$this->status} -> {$newStatus}", ErrCode::INVALID_STATUS_OP);
+            throw new Exception("Invalid status transition: {$this->status} -> {$newStatus}", ErrCode::INVALID_STATUS_OP);
         }
     }
 }

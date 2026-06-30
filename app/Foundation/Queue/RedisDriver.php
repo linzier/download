@@ -9,7 +9,7 @@ use WecarSwoole\Container;
 use WecarSwoole\RedisFactory;
 
 /**
- * 消息队列：Redis 驱动
+ * Message queue: Redis driver
  */
 class RedisDriver implements QueueDriverInterface
 {
@@ -23,7 +23,7 @@ class RedisDriver implements QueueDriverInterface
     }
     
     /**
-     * 入列失败不重试，由后台任务稍后重新入列
+     * No retry on enqueue failure; a background task will re-enqueue later
      */
     public function push(Job $job): bool
     {
@@ -31,7 +31,7 @@ class RedisDriver implements QueueDriverInterface
     }
 
     /**
-     * 出列需要捕获异常，防止异常导致队列监听中断
+     * Dequeue must catch exceptions to prevent them from interrupting the queue listener
      */
     public function pop(float $timeout = 3.0): ?Job
     {

@@ -4,8 +4,8 @@ use function WecarSwoole\Config\apollo;
 use WecarSwoole\Util\File;
 
 $baseConfig = [
-    'app_name' => '用户系统',
-    // 应用标识
+    'app_name' => 'User System',
+    // Application identifier
     'app_flag' => 'YH',
     'app_id' => 10017,
     'request_id_key' => 'wcc-request-id',
@@ -13,7 +13,7 @@ $baseConfig = [
         'modules' => apollo('fw.modules'),
         'app_ids' => apollo('fw.appids'),
     ],
-    // 邮件。可以配多个
+    // Mailer. Multiple mailers can be configured
     'mailer' => [
         'default' => [
             'host' => apollo('fw.mail', 'mail.host'),
@@ -23,24 +23,24 @@ $baseConfig = [
             'encryption' => apollo('fw.mail', 'mail.encryption') ?: 'ssl',
         ]
     ],
-    // 并发锁配置
+    // Concurrent lock configuration
     'concurrent_locker' => [
         'onoff' => apollo('application', 'concurrent_locker.onoff') ?: 'off',
         'redis' => apollo('application', 'concurrent_locker.redis') ?: 'main',
     ],
-    // 请求日志配置。默认是关闭的，如果项目需要开启，则自行修改为 on
+    // Request log configuration. Disabled by default; set to 'on' to enable
     'request_log' => [
         'onoff' => apollo('application', 'request_log.onoff') ?: 'off',
-        // 记录哪些请求类型的日志
+        // Which request methods to log
         'methods' => explode(',', apollo('application', 'request_log.methods'))
     ],
     /**
-     * 数据库配置建议以数据库名作为 key
-     * 如果没有读写分离，则可不分 read, write，直接在里面写配置信息
+     * It is recommended to use the database name as the key
+     * If read-write separation is not needed, there is no need to split into read/write -- just write the config directly
      */
     'mysql' => [
         'weicheche' => [
-            // 读库使用二维数组配置，以支持多个读库
+            // Read replicas configured as a 2D array to support multiple read replicas
             'read' => [
                 [
                     'host' => apollo('fw.mysql.weicheche.ro', 'weicheche_read.host'),
@@ -51,7 +51,7 @@ $baseConfig = [
                     'charset' => apollo('fw.mysql.weicheche.ro', 'weicheche_read.charset'),
                 ]
             ],
-            // 仅支持一个写库
+            // Only one write replica supported
             'write' => [
                 'host' => apollo('fw.mysql.weicheche.rw', 'weicheche.host'),
                 'port' => apollo('fw.mysql.weicheche.rw', 'weicheche.port'),
@@ -60,7 +60,7 @@ $baseConfig = [
                 'database' => apollo('fw.mysql.weicheche.rw', 'weicheche.dbname'),
                 'charset' => apollo('fw.mysql.weicheche.rw', 'weicheche.charset'),
             ],
-            // 连接池配置
+            // Connection pool configuration
             'pool' => [
                 'size' => apollo('application', 'mysql.weicheche.pool_size') ?: 15
             ]
@@ -72,7 +72,7 @@ $baseConfig = [
             'port' => apollo('fw.redis.01', 'redis.port'),
             'auth' => apollo('fw.redis.01', 'redis.auth'),
             'database' => apollo('fw.redis.01', 'redis.database') ?? 0,
-            // 连接池配置
+            // Connection pool configuration
             '__pool' => [
                 'max_object_num' => apollo('application', 'redis.pool.main.max_num') ?? 15,
                 'min_object_num' => apollo('application', 'redis.pool.main.min_num') ?? 1,
@@ -84,7 +84,7 @@ $baseConfig = [
             'port' => apollo('fw.redis.01', 'redis.port'),
             'auth' => apollo('fw.redis.01', 'redis.auth'),
             'database' => apollo('fw.redis.01', 'redis.database') ?? 0,
-            // 连接池配置
+            // Connection pool configuration
             '__pool' => [
                 'max_object_num' => apollo('application', 'redis.pool.cache.max_num') ?? 15,
                 'min_object_num' => apollo('application', 'redis.pool.cache.min_num') ?? 1,
@@ -92,15 +92,15 @@ $baseConfig = [
             ]
         ],
     ],
-    // 缓存配置
+    // Cache configuration
     'cache' => [
-        'driver' => apollo('application', 'cache.driver'), // 可用：redis、file、array、null(一般测试时用来禁用缓存)
+        'driver' => apollo('application', 'cache.driver'), // Available drivers: redis, file, array, null (null is typically used to disable caching during testing)
         'prefix' => 'usercenter',
-        'expire' => 3600, // 缓存默认过期时间，单位秒
-        'redis' => 'cache', // 当 driver = redis 时，使用哪个 redis 配置
-        'dir' => File::join(EASYSWOOLE_ROOT, 'storage/cache'), // 当 driver = file 时，缓存存放目录
+        'expire' => 3600, // Default cache expiration time in seconds
+        'redis' => 'cache', // Which Redis config to use when driver = redis
+        'dir' => File::join(EASYSWOOLE_ROOT, 'storage/cache'), // Cache directory when driver = file
     ],
-    // 最低记录级别：debug, info, warning, error, critical, off
+    // Minimum log level: debug, info, warning, error, critical, off
     'log_level' => apollo('application', 'log_level') ?: 'info',
     'base_url' => apollo('application', 'base_url'),
 ];
